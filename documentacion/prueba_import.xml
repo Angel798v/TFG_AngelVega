@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!-- question: 0  -->
+  <question type="category">
+    <category>
+      <text>$course$/top/AROCA SCRUM examen 11-01-2023</text>
+    </category>
+    <info format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">Preguntas test examen Gestión de projectos</p><p dir="ltr" style="text-align: left;"><br></p>]]></text>
+    </info>
+    <idnumber>1</idnumber>
+  </question>
+  
+<question type="multichoice">
+    <name>
+      <text>1</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;"><span lang="ES">¿Quién debe actualizar la estimación del trabajo pendiente durante el sprint?
+Elija una respuesta:
+</span><br></p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber>1</idnumber>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>Respuesta correcta</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Respuesta parcialmente correcta.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Respuesta incorrecta.</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+<answer fraction="100" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;"><span><span lang="ES" style="">El equipo.</span></span><br></p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+<answer fraction="-33.33333" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;"><span lang="ES">El propietario del producto.</span></span><br></p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+<answer fraction="-33.33333" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;"><span lang="ES">El gestor del proyecto.</span></span><br></p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+<answer fraction="-33.33333" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;"><span lang="ES">El scrum master.</span></span><br></p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+</question>
+<question type="multichoice">
+    <name>
+      <text>2</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;"><span lang="ES">Los eventos del marco estándar de scrum son:
+Elija una respuesta:
+</span><br></p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber>2</idnumber>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>Respuesta correcta</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Respuesta parcialmente correcta.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Respuesta incorrecta.</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+<answer fraction="100" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;"><span><span lang="ES" style="">Planificación del sprint, sprint, scrum diario, revisión del sprint y retrospectiva.</span></span><br></p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+<answer fraction="-33.33333" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;"><span lang="ES">Preparación de backlog, asignación de tareas y demostración.</span></span><br></p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+<answer fraction="-33.33333" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;"><span lang="ES">Inicio de sprint, resolución de impedimentos, retrospecitva y sprint.</span></span><br></p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+<answer fraction="-33.33333" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;"><span lang="ES">Preparación de backlog, introspectiva, retrospectiva y entrega.</span></span><br></p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+	</question>
+<question type="multichoice">
+    <name>
+      <text>3</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;"><span lang="ES">"Valoramos más el seguimiento de un plan que la negociación contractual" es un postulado del Manifiesto Ágil.
+Elija una respuesta:
+</span><br></p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber>3</idnumber>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>Respuesta correcta</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Respuesta parcialmente correcta.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Respuesta incorrecta.</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+<answer fraction="-33.33333" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;"><span lang="ES">Verdadero.</span></span><br></p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+<answer fraction="100" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;"><span><span lang="ES" style="">Falso.</span></span><br></p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+</question>
+
+</quiz>
