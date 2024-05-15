@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html th:lang="#{principal.lang}"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}" xmlns:form="http://www.w3.org/1999/html">
+<head>
+    <meta th:charset="#{principal.charset}">
+    <title th:text="#{principal.title}"></title>
+</head>
+<body>
+
+    <div layout:fragment="cabecera">
+        <h1 th:text="#{relacion.creacion}"></h1>
+        <br>
+        <h3 th:text="#{relacion.creacion.explicacion}"></h3>
+    </div>
+
+    <div layout:fragment="contenido">
+
+
+        <form th:action="@{/creacionRelacion}" method="POST" th:object="${relacion}">
+
+            <div class="container py-4">
+                <select class="form-select" th:field="*{nameA}">
+
+                    <option value="" selected th:text="#{relacion.entidadA}"></option>
+                    <option th:each="entidad: ${entidades}" th:value="${entidad.nombre}" th:text="${entidad.nombre}"></option>
+
+                </select>
+                <select class="form-select" th:field="*{cardinalityA}">
+
+                    <option value="" selected th:text="#{relacion.cardinalidad}"></option>
+                    <option value="0..1" th:text="'0..1'"></option>
+                    <option value="N" th:text="'N'"></option>
+
+                </select>
+
+                <br><br>
+
+                <select class="form-select" th:field="*{nameB}">
+
+                    <option value="" selected th:text="#{relacion.entidadB}"></option>
+                    <option th:each="entidad: ${entidades}" th:value="${entidad.nombre}" th:text="${entidad.nombre}"></option>
+
+                </select>
+                <select class="form-select" th:field="*{cardinalityB}">
+
+                    <option value="" selected th:text="#{relacion.cardinalidad}"></option>
+                    <option value="0..1" th:text="'0..1'"></option>
+                    <option value="M" th:text="'M'"></option>
+
+                </select>
+
+                <br><br>
+
+                <h5 th:text="#{relacion.bidireccional.explicacion}"> </h5>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="checkBidireccionalidad" th:field="*{bidireccional}">
+                    <label class="form-check-label" for="checkBidireccionalidad" th:text="#{relacion.bidireccional}"></label>
+                </div>
+            </div>
+            <br>
+            <div class="container row justify-content-center">
+                <div class="col-md-10"><button type="submit" class="btn btn-success" th:text="#{relacion.registrar}"> </button></div>
+                <div class="col-md-2"><a role="button" class="btn btn-danger" th:href="@{/Generacion}" th:text="#{relacion.cancelar}"></a> </div>
+            </div>
+        </form>
+    </div>
+
+</body>
+</html>

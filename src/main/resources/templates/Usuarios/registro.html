@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <meta th:charset="#{principal.charset}">
+    <title th:text="#{principal.title}"></title>
+</head>
+<body>
+
+    <div layout:fragment="cabecera">
+        <h1 th:text="#{registro.encabezado}"></h1>
+    </div>
+
+
+    <div layout:fragment="contenido">
+
+        <div th:if="${param.error}" class="alert alert-danger" th:text="#{registro.param.error}"></div>
+
+        <div class="py-4">
+            <form th:action="@{/registro}" method="post" th:object="${usuario}">
+                <!-- Nombre de usuario -->
+                <div class="form-group input-group">
+                    <label class="control-label input-group-text" for="nombre" th:text="#{registro.username}"></label>
+                    <input id="nombre" type="text" class="form-control" name="nombre" th:field="*{nombreUsuario}" required autofocus="autofocus">
+                </div>
+                <br>
+
+                <!-- Email -->
+                <div class="form-group input-group">
+                    <label class="control-label input-group-text" for="email" th:text="#{registro.email}"></label>
+                    <input id="email" class="form-control" type="email" name="email" th:field="*{email}" required autofocus="autofocus">
+                </div>
+                <br>
+
+                <!-- Contraseña -->
+                <div class="form-group input-group">
+                    <label class="control-label input-group-text" for="password" th:text="#{registro.password}"></label>
+                    <input id="password" class="form-control" type="password" name="password" th:field="*{password}" required autofocus="autofocus">
+                </div>
+                <br>
+
+                <!-- Boton de confirmación -->
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary form-control" th:text="#{registro.button}"></button>
+                </div>
+
+                <div class="mt-4"><span th:text="#{registro.login.1} + ' '"></span><a th:href="@{/login}"><span  th:text="#{registro.login.2}"></span></a></div>
+            </form>
+        </div>
+    </div>
+
+
+</body>
+</html>

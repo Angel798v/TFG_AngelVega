@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <meta th:charset="#{principal.charset}">
+    <title th:text="#{principal.title}"></title>
+</head>
+<body>
+
+    <div layout:fragment="header">
+        <h1 th:text="#{principal.registrarUsuario}"></h1>
+    </div>
+
+
+    <div layout:fragment="content">
+
+        <div th:if="${param.error}" class="alert alert-danger" th:text="'Fail'"></div>
+
+        <div class="py-4">
+            <form th:action="@{/registro}" method="post" th:object="${usuario}">
+                <div class="form-group input-group">
+                    <label class="control-label input-group-text" for="nombre" th:text="#{principal.username}"></label>
+                    <input id="nombre" type="text" class="form-control" name="nombre" th:field="*{username}" required autofocus="autofocus">
+                </div>
+                <br>
+
+                <div class="form-group input-group">
+                    <label class="control-label input-group-text" for="email" th:text="#{principal.email}"></label>
+                    <input id="email" class="form-control" type="email" name="email" th:field="*{email}" required autofocus="autofocus">
+                </div>
+                <br>
+
+                <div class="form-group input-group">
+                    <label class="control-label input-group-text" for="password" th:text="#{principal.password}"></label>
+                    <input id="password" class="form-control" type="password" name="password" th:field="*{password}" required autofocus="autofocus">
+                </div>
+                <br>
+
+                <div class="form-group input-group">
+                    <label class="control-label input-group-text" for="direccion" th:text="'direccion'"></label>
+                    <input id="direccion" class="form-control" type="text" name="direccion" th:field="*{direccion}" required autofocus="autofocus">
+                </div>
+                <br>
+
+                <div class="form-group input-group">
+                    <label class="control-label input-group-text" for="apellidos" th:text="'apellidos'"></label>
+                    <input id="apellidos" class="form-control" type="text" name="apellidos" th:field="*{apellidos}" required autofocus="autofocus">
+                </div>
+                <br>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary form-control" th:text="#{principal.registrarUsuario}"></button>
+                </div>
+
+                <a th:href="@{/login}"><span  th:text="#{principal.login}"></span></a>
+            </form>
+        </div>
+    </div>
+
+
+</body>
+</html>

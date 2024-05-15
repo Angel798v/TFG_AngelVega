@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+
+<html th:lang="#{principal.lang}" xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{layout}" xmlns="http://www.w3.org/1999/html">
+
+	<head>
+		<meta th:charset="#{principal.charset}">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<title th:text="#{principal.title}"> </title>
+
+	</head>
+	<body>
+
+		<div layout:fragment="cabecera">
+			<h1 class="text-left"> Creación de un Atributo </h1>
+
+		</div>
+
+
+		<div layout:fragment="contenido">
+			<div class="container">
+				<br><br>
+				<form th:action="@{/addAtributo}" method="post" th:object="${atributo}">
+
+					<!-- Nombre del atributo -->
+					<label for="nombreAtributo" class="control-label">Introduce el nombre del atributo: </label>
+					<input id="nombreAtributo" type="text" th:field="${atributo.nombre}" required autofocus="autofocus">
+
+					<br><br>
+
+
+
+					<!--Tipo del atributo -->
+					<label class="form-group" th:text="#{atributos.tipo}" for="selectType"></label>
+					<select class="form-select" th:field="${atributo.tipo}" id="selectType">
+						<option value="String" selected th:text="#{atributos.tipo.texto}"></option>
+						<option value="int" th:text="#{atributos.tipo.numerico.entero}"></option>
+						<option value="float" th:text="#{atributos.tipo.numerico.decimal}"></option>
+						<option value="boolean" th:text="#{atributos.tipo.boolean}"></option>
+						<option value="Date" th:text="#{atributos.tipo.fecha}"></option>
+						<option value="Time" th:text="#{atributos.tipo.hora}"></option>
+						<option value="Timestamp" th:text="#{atributos.tipo.fechahora}"></option>
+						<option value="Calendar" th:text="#{atributos.tipo.ano}"></option>
+					</select>
+
+					<br><br>
+
+					<div id="sizeText">
+						<label class="control-label" th:text="#{atributos.sizeText.label}" for="sizeAttribute"></label>
+						<input class="form-control" type="number" id="sizeAttribute" th:placeholder="#{atributos.sizeText.placeholder}" th:field="*{sizeText}">
+						<span class="form-text" th:text="#{atributos.sizeText.info}"></span>
+					</div>
+
+					<br><br><br>
+
+					<h3 th:text="#{atributos.constraints}"></h3>
+					<br>
+
+					<div class="row">
+						<div class="col-4 form-check">
+							<input class="form-check-input" type="checkbox" id="unique" th:field="*{unique}">
+							<label class="form-check-label" for="unique" th:text="#{atributos.unique}"></label>
+						</div>
+					</div>
+					<br>
+
+					<div class="row">
+						<div class="col-4 form-check">
+							<input class="form-check-input" type="checkbox" id="nullable" th:field="*{nullable}">
+							<label class="form-check-label" for="nullable" th:text="#{atributos.nullable}"></label>
+						</div>
+					</div>
+					<br>
+
+					<div class="row">
+						<div class="col-4 form-check">
+							<input class="form-check-input" type="checkbox" id="check" th:field="*{check}" onclick="document.getElementById('checkValue').style.display='block'">
+							<label class="form-check-label" for="check" th:text="#{atributos.check}"></label>
+						</div>
+						<div class="col-4" style="display: none" id="checkValue">
+							<label class="form-label" th:text="#{atributos.check.value}" for="input-check"></label>
+							<input class="form-control" type="text" id="input-check" th:field="*{checkValue}">
+							<span class="form-text" th:text=" #{atributos.check.value.explicacion}"></span>
+						</div>
+					</div>
+					<br>
+
+
+					<div class="row">
+						<div class="col-4 form-check">
+							<input class="form-check-input" type="checkbox" id="default" th:field="*{defaultValue}" onclick="document.getElementById('defaultValue').style.display='block'">
+							<label class="form-check-label" for="default" th:text="#{atributos.default}"></label>
+						</div>
+
+						<div class="col-4" style="display: none" id="defaultValue">
+							<label class="form-label" th:text="#{atributos.default.value}" for="input-default"></label>
+							<input class="form-control" type="text" id="input-default" th:field="*{value}">
+							<span class="form-text" th:text=" #{atributos.default.value.explicacion}"></span>
+						</div>
+					</div>
+					<br>
+
+					<!-- Botón de confirmación -->
+					<br><br>
+					<div class="container row justify-content-center">
+						<div class="col-md-10"><button type="submit" class="btn btn-success" th:text="#{atributos.add}"></button></div>
+						<div class="col-md-2"><a role="button" class="btn btn-danger" th:href="@{/mostrarAtributos}" th:text="#{atributos.cancelar}"></a> </div>
+					</div>
+					<br><br>
+				</form>
+			</div>
+		</div>
+
+	</body>
+</html>
+

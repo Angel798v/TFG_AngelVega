@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html th:lang="#{principal.lang}"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <meta th:charset="#{principal.charset}">
+    <title th:text="#{principal.title}"></title>
+</head>
+<body>
+
+	<div class="container justify-content-center" layout:fragment="header">
+		<h1 th:text="'Mecanico'"></h1>
+	</div>
+
+	<div class="container" layout:fragment="content">
+
+		<div class="container">
+			<form th:action="@{/Mecanico/Put/} + ${object.id_mecanico}" method="POST" th:object="${object}">
+
+				<div class="input-group mt-5">
+					<label for="id_mecanico" class="control-label input-group-text" th:text="'id_mecanico'"></label>
+					<input id="id_mecanico" class="form-control" required th:field="*{id_mecanico}" disabled th:value="*{id_mecanico}">
+				</div>
+
+				<div class="input-group mt-5">
+					<label for="nombre" class="control-label input-group-text" th:text="'nombre'"></label>
+					<input id="nombre" class="form-control" required th:field="*{nombre}" th:value="*{nombre}">
+				</div>
+
+				<button type="submit" class="btn btn-success mt-5" th:text="#{principal.save}"></button>
+			</form>
+		</div>
+
+		<div class="row mt-4">
+			<div class="col-10"></div>
+			<div class="col-2"><a role="button" class="btn btn-danger" th:href="@{/Mecanico}" th:text="#{principal.back}"></a></div>
+		</div>
+	</div>
+
+</body>
+</html>

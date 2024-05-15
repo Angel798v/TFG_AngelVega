@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html th:lang="#{principal.lang}" xmlns:th="http://www.thymeleaf.org"
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layout}">
+<head>
+    <meta th:charset="#{principal.charset}">
+    <title th:text="#{principal.title}"></title>
+</head>
+<body>
+
+    <div layout:fragment="cabecera">
+
+        <span> <h1 th:text="#{creacion.propiedades}"></h1> </span>
+
+    </div>
+
+    <div layout:fragment="contenido">
+
+        <form th:action="@{/Creacion}" method="post" th:object="${proyecto}">
+
+            <div th:unless="${notNullProyect}">
+
+                <div class="form-group input-group py-3">
+                    <label for="title" class="control-label input-group-text"> <span th:text="#{generador.title}"></span>:  </label>
+                    <input id="title" class="form-control" type="text" th:field="*{title}" required autofocus="autofocus" th:placeholder="#{creacion.placeholder.30}">
+                </div>
+                <div class="form-group input-group py-3">
+                    <label for="abr_title" class="control-label input-group-text"> <span th:text="#{generador.abr_title}"></span>:  </label>
+                    <input id="abr_title" class="form-control" type="text" th:field="*{abr_title}" required autofocus="autofocus" th:placeholder="#{creacion.placeholder.20}">
+                </div>
+                <div class="form-group input-group py-3">
+                    <label for="dir_name" class="control-label input-group-text"><span th:text="#{generador.dir}"></span></label>
+                    <input id="dir_name" class="form-control" type="text" th:field="*{dir}" required autofocus="autofocus" th:placeholder="#{creacion.placeholder.15}">
+                </div>
+                <div class="form-group input-group py-3">
+                    <label for="nameApplication" class="control-label input-group-text"><span th:text="#{generador.nameApplication}"></span></label>
+                    <input id="nameApplication" class="form-control" type="text" th:field="*{nameApplication}" required autofocus="autofocus">
+                </div>
+                <div class="form-group input-group py-3">
+                    <label for="nameDB" class="control-label input-group-text"><span th:text="#{generador.nameDB}"></span></label>
+                    <input id="nameDB" class="form-control" type="text" th:field="*{nameDB}" required autofocus="autofocus">
+                </div>
+                <div class="form-group input-group py-3">
+                    <label for="numPuerto" class="control-label input-group-text"><span th:text="#{generador.numPuerto}"></span></label>
+                    <input id="numPuerto" class="form-control" type="number" th:field="*{numPuerto}" required autofocus="autofocus">
+                </div>
+                <br><br>
+                <div class="row">
+                    <div class="col-md-11">
+                        <button class="btn btn-success" type="submit" th:text="#{creacion.save}"></button>
+                    </div>
+                    <div class="col-md-1">
+                        <a role="button" class="btn btn-warning" th:href="@{/IndexGenerador}" th:text="#{creacion.inicio}"></a>
+                    </div>
+                </div>
+                <br><br>
+
+            </div>
+
+            <div th:if="${notNullProyect}">
+
+                <div class="form-group input-group py-3">
+                    <label for="title2" class="control-label input-group-text"> <span th:text="#{generador.title}"></span>:  </label>
+                    <input id="title2" class="form-control" type="text" th:field="*{title}" th:value="*{title}" required autofocus="autofocus" th:placeholder="#{creacion.placeholder.30}">
+                </div>
+                <div class="form-group input-group py-3">
+                    <label for="abr_title2" class="control-label input-group-text"> <span th:text="#{generador.abr_title}"></span>:  </label>
+                    <input id="abr_title2" class="form-control" type="text" th:field="*{abr_title}" th:value="*{abr_title}" required autofocus="autofocus" th:placeholder="#{creacion.placeholder.20}">
+                </div>
+                <div class="form-group input-group py-3">
+                    <label for="dir_name2" class="control-label input-group-text"><span th:text="#{generador.dir}"></span></label>
+                    <input id="dir_name2" class="form-control" type="text" th:field="*{dir}" th:value="*{dir}" required autofocus="autofocus" th:placeholder="#{creacion.placeholder.15}">
+                </div>
+                <div class="form-group input-group py-3">
+                    <label for="nameApplication2" class="control-label input-group-text"><span th:text="#{generador.nameApplication}"></span></label>
+                    <input id="nameApplication2" class="form-control" type="text" th:field="*{nameApplication}" th:value="*{nameApplication}" required autofocus="autofocus">
+                </div>
+                <div class="form-group input-group py-3">
+                    <label for="nameDB2" class="control-label input-group-text"><span th:text="#{generador.nameDB}"></span></label>
+                    <input id="nameDB2" class="form-control" type="text" th:field="*{nameDB}" th:value="*{nameDB}" required autofocus="autofocus">
+                </div>
+                <div class="form-group input-group py-3">
+                    <label for="numPuerto2" class="control-label input-group-text"><span th:text="#{generador.numPuerto}"></span></label>
+                    <input id="numPuerto2" class="form-control" type="number" th:field="*{numPuerto}" th:value="*{numPuerto}" required autofocus="autofocus">
+                </div>
+                <br><br>
+                <div class="row">
+                    <div class="col-md-11">
+                        <button class="btn btn-success" type="submit" th:text="#{creacion.save}"></button>
+                    </div>
+                    <div class="col-md-1">
+                        <a role="button" class="btn btn-warning" th:href="@{/IndexGenerador}" th:text="#{creacion.inicio}"></a>
+                    </div>
+                </div>
+                <br><br>
+
+            </div>
+
+
+        </form>
+
+    </div>
+
+</body>
+</html>

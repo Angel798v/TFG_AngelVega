@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html th:lang="#{principal.lang}"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <meta th:charset="#{principal.charset}">
+    <title th:text="#{principal.title}"></title>
+</head>
+<body>
+
+    <div class="container py-3" layout:fragment="cabecera">
+        <h1 th:text="#{setIdiomaDefault.encabezado.h1}"></h1>
+    </div>
+
+    <div class="container py-3" layout:fragment="contenido">
+        <p th:text="#{setIdiomaDefault.explicacion.p}"></p>
+
+        <form th:action="@{/setIdiomaDefault}" method="POST" th:object="${idioma}">
+            <div class="form-floating">
+                <select id="select_defaultLanguage" class="form-select" aria-label="Floating label select example" th:field="*{nombreIdioma}" >
+                    <option th:each="lan : ${idiomas}" th:value="${lan.nombreIdioma}"><span th:text="${lan.nombreIdioma} + ' - ' + ${lan.abreviatura}"></span></option>
+                </select>
+                <label for="select_defaultLanguage" th:text="#{setIdiomaDefault.select.label}"></label>
+            </div>
+
+            <div class="container row mt-5">
+                <div class="col-11"><button type="submit" class="btn btn-success" th:text="#{setIdiomaDefault.submit.button}"></button> </div>
+                <div class="col-1"><a role="button" class="btn btn-danger" th:href="@{/idiomas}" th:text="#{setIdiomaDefault.cancel.button}"></a></div>
+            </div>
+
+        </form>
+    </div>
+
+</body>
+</html>

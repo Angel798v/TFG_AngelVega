@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html th:lang="#{principal.lang}"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}" xmlns:form="http://www.w3.org/1999/html">
+<head>
+    <meta th:charset="#{principal.charset}">
+    <title th:text="#{principal.title}"></title>
+</head>
+<body>
+
+    <div layout:fragment="cabecera">
+        <h1 th:text="#{creacionIdioma}"></h1>
+    </div>
+
+    <div layout:fragment="contenido">
+
+        <div class="py-3">
+
+            <form th:action="@{/creacionIdioma}" method="POST" th:object="${idioma}">
+
+
+                <div class="py-3">
+                    <h4 th:text="#{creacionIdioma.explicacion}"></h4>
+
+                    <div class="py-4">
+
+                        <div class="input-group">
+                            <label class="control-label input-group-text" for="name" th:text="#{creacionIdioma.nombre}"></label>
+                            <input class="form-control" id="name" type="text" required autofocus="autofocus" th:field="*{nombreIdioma}">
+                        </div>
+
+                        <div class="input-group mt-3">
+                            <label class="control-label input-group-text" for="abreviatura" th:text="#{creacionIdioma.abreviatura}"></label>
+                            <input class="form-control" id="abreviatura" type="text" required autofocus="autofocus" th:field="*{abreviatura}">
+                        </div>
+                        <p class="" th:text="#{creacionIdioma.abreviatura.text}"></p>
+                        <span class="alert alert-danger py-2" th:text="#{creacionIdioma.abreviatura.alert}"></span>
+
+
+
+                        <h3 class="py-3 mt-5" th:text="#{creacionIdioma.synonymous}"></h3>
+                        <p th:text="#{creacionIdioma.synonymous.explicacion.p}"></p>
+                        <div class="input-group mb-3">
+                            <label class="control-label input-group-text" for="operationGET" th:text="#{creacionIdioma.visualizar}"></label>
+                            <input class="form-control" id="operationGET" type="text" required autofocus="autofocus" th:field="*{button_GET}">
+                        </div>
+                        <div class="input-group mb-3">
+                            <label class="control-label input-group-text" for="operationPOST" th:text="#{creacionIdioma.add}"></label>
+                            <input class="form-control" id="operationPOST" type="text" required autofocus="autofocus" th:field="*{button_POST}">
+                        </div>
+                        <div class="input-group mb-3">
+                            <label class="control-label input-group-text" for="operationPUT" th:text="#{creacionIdioma.edit}"></label>
+                            <input class="form-control" id="operationPUT" type="text" required autofocus="autofocus" th:field="*{button_PUT}">
+                        </div>
+                        <div class="input-group mb-3">
+                            <label class="control-label input-group-text" for="operationDELETE" th:text="#{creacionIdioma.delete}"></label>
+                            <input class="form-control" id="operationDELETE" type="text" required autofocus="autofocus" th:field="*{button_DELETE}">
+                        </div>
+
+                        <div class="input-group mb-3">
+                            <label class="control-label input-group-text" for="home" th:text="#{creacionIdioma.home}"></label>
+                            <input class="form-control" id="home" type="text" required autofocus="autofocus" th:field="*{inicio}">
+                        </div>
+                        <div class="input-group mb-3">
+                            <label class="control-label input-group-text" for="services" th:text="#{creacionIdioma.services}"></label>
+                            <input class="form-control" id="services" type="text" required autofocus="autofocus" th:field="*{servicios}">
+                        </div>
+                        <div class="input-group mb-3">
+                            <label class="control-label input-group-text" for="errorPage" th:text="#{creacionIdioma.errorPage}"></label>
+                            <input class="form-control" id="errorPage" type="text" required autofocus="autofocus" th:field="*{paginaError}">
+                        </div>
+                        <div class="input-group mb-3">
+                            <label class="control-label input-group-text" for="username" th:text="#{creacionIdioma.username}"></label>
+                            <input class="form-control" id="username" type="text" required autofocus="autofocus" th:field="*{username}">
+                        </div>
+                        <div class="input-group mb-3">
+                            <label class="control-label input-group-text" for="password" th:text="#{creacionIdioma.password}"></label>
+                            <input class="form-control" id="password" type="text" required autofocus="autofocus" th:field="*{password}">
+                        </div>
+                        <div class="input-group mb-3">
+                            <label class="control-label input-group-text" for="email" th:text="#{creacionIdioma.email}"></label>
+                            <input class="form-control" id="email" type="text" required autofocus="autofocus" th:field="*{email}">
+                        </div>
+                        <div class="input-group mb-3">
+                            <label class="control-label input-group-text" for="rol" th:text="#{creacionIdioma.rol}"></label>
+                            <input class="form-control" id="rol" type="text" required autofocus="autofocus" th:field="*{rol}">
+                        </div>
+                        <div class="input-group mb-3">
+                            <label class="control-label input-group-text" for="usuarios" th:text="#{creacionIdioma.usuarios}"></label>
+                            <input class="form-control" id="usuarios" type="text" required autofocus="autofocus" th:field="*{usuarios}">
+                        </div>
+                        <div class="input-group mb-3">
+                            <label class="control-label input-group-text" for="save" th:text="#{creacionIdioma.save}"></label>
+                            <input class="form-control" id="save" type="text" required autofocus="autofocus" th:field="*{save}">
+                        </div>
+                        <div class="input-group mb-3">
+                            <label class="control-label input-group-text" for="back" th:text="#{creacionIdioma.back}"></label>
+                            <input class="form-control" id="back" type="text" required autofocus="autofocus" th:field="*{back}">
+                        </div>
+                        <div class="input-group mb-3">
+                            <label class="control-label input-group-text" for="login" th:text="#{creacionIdioma.login}"></label>
+                            <input class="form-control" id="login" type="text" required autofocus="autofocus" th:field="*{login}">
+                        </div>
+                        <div class="input-group mb-3">
+                            <label class="control-label input-group-text" for="logout" th:text="#{creacionIdioma.logout}"></label>
+                            <input class="form-control" id="logout" type="text" required autofocus="autofocus" th:field="*{logout}">
+                        </div>
+                        <div class="input-group mb-3">
+                            <label class="control-label input-group-text" for="signup" th:text="#{creacionIdioma.signup}"></label>
+                            <input class="form-control" id="signup" type="text" required autofocus="autofocus" th:field="*{signup}">
+                        </div>
+                        <div class="input-group mb-3">
+                            <label class="control-label input-group-text" for="registrarUsuario" th:text="#{creacionIdioma.registrarUsuario}"></label>
+                            <input class="form-control" id="registrarUsuario" type="text" required autofocus="autofocus" th:field="*{registrarUsuario}">
+                        </div>
+                        <div class="input-group mb-3">
+                            <label class="control-label input-group-text" for="idioma" th:text="#{creacionIdioma.idioma}"></label>
+                            <input class="form-control" id="idioma" type="text" required autofocus="autofocus" th:field="*{idioma}">
+                        </div>
+
+                        <br><br>
+                        <div class="row justify-content-center">
+                            <div class="col-md-11"><button type="submit" class="btn btn-info" th:text="#{creacionIdioma.addIdioma}"></button></div>
+                            <div class="col-md-1"><a role="button" class="btn btn-danger" th:href="@{/idiomas}" th:text="#{creacionIdioma.cancelar}"></a> </div>
+                        </div>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>

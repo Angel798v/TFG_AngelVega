@@ -1,0 +1,44 @@
+
+<!DOCTYPE html>
+
+<html th:lang="#{principal.lang}" xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{layout}" xmlns="http://www.w3.org/1999/html">
+
+	<head>
+		<meta th:charset="#{principal.charset}">
+		<title th:text="#{principal.title}"> </title>
+
+	</head>
+	<body>
+
+		<div layout:fragment="cabecera">
+			<h1 class="display-2 mb-3" th:text="#{colorPicker.h1}"></h1>
+		</div>
+
+
+		<div layout:fragment="contenido">
+
+			<form th:action="@{/colorPicker}" method="POST" th:object="${colorPicker}">
+
+				<div class="row">
+					<div class="col-6">
+						<label for="principalCodeColor" class="form-label" th:text="#{colorPicker.principal.label}"></label>
+						<input type="color" class="form-control form-control-color" id="principalCodeColor" value="#8ED8F1" title="Choose a color" th:field="*{principalCodeColor}">
+					</div>
+					<div class="col-6">
+						<label for="myColor" class="form-label" th:text="#{colorPicker.secondary.label}"></label>
+						<input type="color" class="form-control form-control-color" id="myColor" value="#8ED8F1" title="Choose a color" th:field="*{secondaryCodeColor}">
+					</div>
+				</div>
+
+				<div class="row mt-5">
+					<div class="col-10"><button type="submit" class="btn btn-success mt-3" th:text="#{colorPicker.save.button}"></button></div>
+					<div class="col-2"><a role="button" class="btn btn-danger" th:href="@{/Design}" th:text="#{colorPicker.cancel.button}"></a></div>
+				</div>
+
+			</form>
+		</div>
+	</body>
+</html>
+

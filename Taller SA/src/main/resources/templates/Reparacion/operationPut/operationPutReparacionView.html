@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html th:lang="#{principal.lang}"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <meta th:charset="#{principal.charset}">
+    <title th:text="#{principal.title}"></title>
+</head>
+<body>
+
+	<div class="container justify-content-center" layout:fragment="header">
+		<h1 th:text="'Reparacion'"></h1>
+	</div>
+
+	<div class="container" layout:fragment="content">
+		<table class="table table-responsive">
+			<thead>
+				<tr>
+					<td><strong th:text="'id_reparacion'"></strong></td>
+					<td><strong th:text="'id_mecanico'"></strong></td>
+					<td><strong th:text="'id_cliente'"></strong></td>
+					<td><strong th:text="'id_tipo_servicio'"></strong></td>
+					<td><strong th:text="'User_id'"></strong></td>
+					<td></td>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="object : ${listAll}">
+					<td th:text="${object.id_reparacion}"></td>
+					<td th:if="${object.mecanico.id_mecanico}" th:text="${object.mecanico.id_mecanico}"></td>
+					<td th:if="${object.cliente.id_cliente}" th:text="${object.cliente.id_cliente}"></td>
+					<td th:if="${object.tipo_servicios}"><p th:each="suboject : ${object.tipo_servicios}" th:text="${suboject.toString()}"></p></td>
+					<td th:if="${object.user}" th:text="${object.user}"></td>
+					<td><a role="button" class="btn btn-info" th:href="@{/Reparacion/Put/} + ${object.id_reparacion}" th:text="'Edit'"></a></td>
+				</tr>
+			</tbody>
+		</table>
+
+		<div class="row mt-4">
+			<div class="col-10"></div>
+			<div class="col-2"><a role="button" class="btn btn-danger" th:href="@{/Reparacion}" th:text="#{principal.back}"></a></div>
+		</div>
+	</div>
+
+</body>
+</html>

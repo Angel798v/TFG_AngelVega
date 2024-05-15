@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html th:lang="#{principal.lang}"  xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <meta th:charset="#{principal.charset}">
+    <title th:text="#{principal.title}"></title>
+</head>
+<body>
+
+    <div layout:fragment="cabecera">
+        <h1 class="display-1" th:text="#{security.encabezado}"></h1>
+    </div>
+
+    <div layout:fragment="contenido">
+
+        <div class="container py-5">
+            <h3 th:text="#{security.usersAdmin}"></h3>
+
+            <div th:if="${param.removedAdmin}" class="py-4" ><span class="alert alert-warning" th:text="#{security.removeAdmin.alert}"></span></div>
+            <div th:if="${param.exitoAdmin}" class="py-4" ><span class="alert alert-info" th:text="#{security.addAdmin.alert}"></span></div>
+
+
+            <div th:if="${isAdminUser}" class="container py-5">
+                <p class="mb-5" th:text="#{security.UserAdmin.True}"></p>
+                <table class="table table-responsive-sm table-bordered table-striped table-dark table-hover text-center border-secondary ">
+                    <thead>
+                        <tr>
+                            <td><strong th:text="#{security.userAdmin.email}"></strong> </td>
+                            <td><strong th:text="#{security.userAdmin.username}"></strong></td>
+                            <td><strong th:text="#{security.userAdmin.password}"></strong> </td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td th:text="${adminUser.getEmail()}"></td>
+                            <td th:text="${adminUser.getUsername()}"></td>
+                            <td th:text="${adminUser.getPassword()}"></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="row">
+                    <div class="col-11">
+                        <a role="button" class="btn btn-danger" th:href="@{/eliminarUserAdmin}" th:text="#{security.removeAdmin.button}"></a>
+                    </div>
+                    <div class="col-1">
+
+                    </div>
+                </div>
+
+            </div>
+
+            <div th:unless="${isAdminUser}" class="container row py-5">
+                <p th:text="#{security.UserAdmin.False}"></p>
+                <div class="col-11">
+                    <a role="button" class="btn btn-success mt-3" th:href="@{/registrarAdmin}" th:text="#{security.addAdmin.button}"></a>
+                </div>
+                <div class="col-1">
+                </div>
+
+            </div>
+        </div>
+
+        <hr class="divider">
+
+        <div class="container py-4">
+            <h3 class="mb-4" th:text="#{security.roles}"></h3>
+
+            <div th:if="${param.exitoRol}" class="py-4" ><span class="alert alert-info" th:text="#{security.addRole.alert}"></span></div>
+            <div th:if="${param.errorRol}" class="py-4" ><span class="alert alert-danger" th:text="#{security.addRole.error.alert}"></span></div>
+            <div th:if="${param.removedRoles}" class="py-4"><span class="alert alert-danger" th:text="#{security.removeRoles}"></span></div>
+
+            <p th:text="#{security.roles.encabezado}"></p>
+
+            <table class="table table-responsive table-bordered table-striped table-dark table-hover text-center border-secondary">
+
+                <thead>
+                    <tr>
+                        <td><strong th:text="#{security.roles.id}"></strong></td>
+                        <td><strong th:text="#{security.roles.roleName}"></strong></td>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr th:each="rol : ${roles}">
+                        <td th:text="${rol.id}"></td>
+                        <td th:text="${rol.roleName}"></td>
+                    </tr>
+                </tbody>
+
+                <tfoot>
+                    <tr>
+                        <td><a role="button" class="btn btn-info" th:href="@{/addRole}" th:text="#{security.roles.addRole.button}"></a></td>
+                        <td><a role="button" class="btn btn-danger" th:href="@{/clearRoles}" th:text="#{security.roles.remove.button}"></a></td>
+                    </tr>
+                </tfoot>
+
+            </table>
+
+            <p class="mt-2" th:text="#{security.roles.info}"></p>
+
+        </div>
+
+        <hr class="divider py-3 mb-3">
+
+        <div th:if="${param.switchTrue}" class="container alert alert-info" th:text="#{security.param.switchTrue}"></div>
+        <div th:if="${param.switchFalse}" class="container alert alert-warning" th:text="#{security.param.switchFalse}"></div>
+
+        <div class="container py-3 mb-3">
+            <form th:action="@{/SecurityProperties/switchRegistryValue}" method="POST">
+                <div th:if="${registrarUsuarios}" class="container py-3">
+                    <h5 th:text="#{security.registry.enabled}"></h5>
+                    <br>
+                    <button type="submit" class="btn btn-warning" th:text="#{security.registry.enabled.button}"></button>
+                </div>
+
+                <div th:unless="${registrarUsuarios}" class="container py-3">
+                    <h5 th:text="#{security.registry.disabled}"></h5>
+                    <br>
+                    <button type="submit" class="btn btn-info" th:text="#{security.registry.disabled.button}"></button>
+                </div>
+            </form>
+            <div th:if="${registrarUsuarios}" class="container mt-3">
+                <p th:if="${defaultRole}" th:text="#{security.defaultRole.p} + ' ' +  ${defaultRole.getRoleName()}"></p>
+                <p th:unless="${defaultRole}" th:text="#{security.defaultRole.unless.p}"></p>
+                <br>
+                <p th:text="#{security.changeDefaultRole}"></p>
+                <form id="defaultRole" th:action="@{/SecurityProperties/changeDefaultRole}" method="POST" th:object="${changeDefaultRole}">
+                    <div class="form-floating">
+                        <select class="form-select" id="change_defaultRole" th:field="*{roleName}">
+                            <option th:each="role : ${roles}" th:value="${role.roleName}" th:text="${role.roleName}"></option>
+                        </select>
+                        <label for="change_defaultRole" th:text="#{security.defaultRole.label}"></label>
+                    </div>
+                    <div class="mt-5">
+                        <button type="submit" class="btn btn-success" th:text="#{security.defaultRole.change.button}"></button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <hr class="divider py-3 mb-3">
+
+
+        <div class="container py-4">
+            <div class="py-3">
+                <h3 class="mb-5" th:text="#{security.rolesPagina.h3}"></h3>
+
+                <p th:text="#{security.rolesPagina.explicacion.info.ul}"></p>
+                <ul>
+                    <li th:text="#{security.rolesPagina.explicacion.info.ul.1}"></li>
+                    <li th:text="#{security.rolesPagina.explicacion.info.ul.2}"></li>
+                    <li th:text="#{security.rolesPagina.explicacion.info.ul.3}"></li>
+                    <li th:text="#{security.rolesPagina.explicacion.info.ul.4}"></li>
+                </ul>
+
+                <p th:text="#{security.rolesPagina.explicacion.info.p}"></p>
+            </div>
+
+            <table class="table table-responsive table-bordered table-striped table-dark table-hover text-center border-secondary">
+
+                <thead>
+                    <tr>
+                        <td><strong th:text="#{security.rolesPagina.table.entidad}"></strong></td>
+                        <td><strong th:text="#{security.rolesPagina.table.editar}"></strong> </td>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr th:each="entidad : ${entidades}">
+                        <td th:text="${entidad.nombre}"></td>
+                        <td><a role="button" class="btn btn-info" th:href="@{/roles/} + ${entidad.nombre}" th:text="#{security.rolesPagina.table.editar.button}"></a></td>
+                    </tr>
+                </tbody>
+
+            </table>
+
+        </div>
+
+        <div class="row">
+            <div class="col-11">
+
+            </div>
+            <div class="col-1">
+                <a role="button" class="btn btn-warning" th:href="@{IndexGenerador}" th:text="#{security.button.index}"></a>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

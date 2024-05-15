@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html th:lang="#{principal.lang}"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <meta th:charset="#{principal.charset}">
+    <title th:text="#{principal.title}"></title>
+</head>
+<body>
+
+	<div class="container justify-content-center" layout:fragment="header">
+		<h1 th:text="'Cliente'"></h1>
+	</div>
+
+	<div class="container" layout:fragment="content">
+
+		<div class="container">
+			<form th:action="@{/Cliente/Put/} + ${object.id_cliente}" method="POST" th:object="${object}">
+
+				<div class="input-group mt-5">
+					<label for="id_cliente" class="control-label input-group-text" th:text="'id_cliente'"></label>
+					<input id="id_cliente" class="form-control" required th:field="*{id_cliente}" disabled th:value="*{id_cliente}">
+				</div>
+
+				<button type="submit" class="btn btn-success mt-5" th:text="#{principal.save}"></button>
+			</form>
+		</div>
+
+		<div class="row mt-4">
+			<div class="col-10"></div>
+			<div class="col-2"><a role="button" class="btn btn-danger" th:href="@{/Cliente}" th:text="#{principal.back}"></a></div>
+		</div>
+	</div>
+
+</body>
+</html>

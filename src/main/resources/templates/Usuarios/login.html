@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html th:lang="#{principal.lang}" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}" >
+<head>
+    <meta th:charset="#{principal.charset}">
+    <title th:text="#{principal.title}"></title>
+</head>
+<body>
+
+    <div layout:fragment="cabecera">
+        <h1 th:text="#{login.encabezado}"></h1>
+    </div>
+
+    <div layout:fragment="contenido">
+
+        <div class="py-4 container">
+            <form th:action="@{/login}" method="post">
+
+                <div th:if="${param.error}" class="alert alert-danger" th:text="#{login.param.error}"></div>
+
+                <div th:if="${param.logout}" class="alert alert-info" th:text="#{login.logout}"></div>
+
+                <!-- Nombre de usuario -->
+                <div class="form-group input-group">
+                    <label class="control-label input-group-text" for="username" th:text="#{login.username}"></label>
+                    <input id="username" type="text" class="form-control" name="username" required autofocus="autofocus" th:placeholder="#{login.username}">
+                </div>
+                <br>
+
+                <!-- Password -->
+                <div class="form-group input-group">
+                    <label class="control-label input-group-text" for="password" th:text="#{login.password}"></label>
+                    <input id="password" type="password" class="form-control" name="password" required autofocus="autofocus" th:placeholder="#{login.password}">
+                </div>
+                <br>
+
+                <!-- Boton de confirmación -->
+                <button type="submit" class="btn btn-primary form-control " th:text="#{login.button}"></button>
+
+
+            </form>
+            <br>
+            <div class="container">
+                <span th:text="#{login.signup.1} + ' '"></span><a class="" th:href="@{/registro}"><span th:text="#{login.signup.2}"></span></a>
+            </div>
+
+        </div>
+
+    </div>
+</body>
+</html>

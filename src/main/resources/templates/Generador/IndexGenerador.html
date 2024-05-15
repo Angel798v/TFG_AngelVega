@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html th:lang="#{principal.lang}" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}" xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <meta th:charset="#{principal.charset}">
+    <title th:text="#{principal.title}"> </title>
+</head>
+<body>
+
+    <div layout:fragment="cabecera">
+        <span class="display-1" th:text="#{generador.project} + ': '"></span><span class="display-1 fst-italic" th:text="${title} + ' - ' + ${abrTitle}"></span>
+    </div>
+
+    <div layout:fragment="contenido">
+        <br><br>
+        <div class="container mb-5 py-3">
+            <div class="row">
+                <div class="col-md-3 card rounded text-light text-center justify-content-center" style="background-color: #658c46; height: 8rem">
+                    <p class="display-5" th:text="#{generador.creacion.modelo}"></p>
+                    <a class="stretched-link" th:href="@{/Generacion}"></a>
+                </div>
+                <div class="col-md-1"></div>
+                <div class="col-md-3 card rounded text-light text-center justify-content-center" style="background-color: cornflowerblue; height: 8rem">
+                    <p class="display-5" th:text="#{generador.creacion.idiomas}"></p>
+                    <a class="stretched-link" th:href="@{/idiomas}"></a>
+                </div>
+                <div class="col-md-1"></div>
+                <div class="col-md-3 card rounded text-light text-center justify-content-center" style="background-color: orange; height: 8rem">
+                    <p class="display-5" th:text="#{generador.creacion.titulo}"></p>
+                    <a class="stretched-link" th:href="@{/Creacion}"></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                <div class="col-md-3 card rounded text-light text-center justify-content-center" style="background-color: darkblue; height: 8rem">
+                    <p class="display-5" th:text="#{generador.creacion.seguridad}"></p>
+                    <a class="stretched-link" th:href="@{/SecurityProperties}"></a>
+                </div>
+                <div class="col-md-1"></div>
+                <div class="col-md-3 card rounded text-light text-center justify-content-center" style="background-color: slateblue; height: 8rem">
+                    <p class="display-5" th:text="#{generador.creacion.diseño}"></p>
+                    <a class="stretched-link" th:href="@{/Design}"></a>
+                </div>
+                <div class="col-md-1"></div>
+                <div class="col-md-3" sec:authorize="hasRole('ADMIN')">
+                    <form th:action="@{/cargarRegistros}" method="POST"><button type="submit" class="btn btn-lg btn-secondary" th:text="'Cargar registros predefinidos'"></button></form>
+                </div>
+            </div>
+        </div>
+
+        <br><br><br><br><br>
+        <div class="container mt-5 row">
+            <div class="col-12 w-100">
+                <form th:action="@{/GenerateApplication}" method="POST"><button type="submit" class="btn btn-success w-100 display-3 fst-italic fs-3" style="height: 4rem" th:text="#{generador.button}"></button></form>
+            </div>
+        </div>
+
+
+
+    </div>
+
+</body>
+</html>

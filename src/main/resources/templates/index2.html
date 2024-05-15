@@ -1,0 +1,50 @@
+<!doctype html>
+<html th:lang="#{principal.lang}"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.w3.org/1999/xhtml"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout21}">
+<head>
+    <meta th:charset="#{principal.charset}">
+    <title th:text="#{principal.title}"> </title>
+</head>
+
+
+<body>
+
+    <div layout:fragment="cabecera" class="container-fluid">
+        <div class="p-sm-5 mb-4 rounded text-body-emphasis text-center shadow" style="background-color: #d7f2ff;">
+            <h1 class="display-1">TITLE</h1>
+        </div>
+    </div>
+
+    <div layout:fragment="contenido">
+        <div class="row">
+            <div class="col-1 mt-5"></div>
+            <div class="col-4 p-4 mt-5 border rounded text-center bg-body-secondary">
+                <h3 class="display-4">Notas</h3>
+                <a role="button" href="#" class="btn btn-info display-4">-></a>
+            </div>
+            <div class="col-1 1mt-5"></div>
+
+            <div class="col-1 mt-5"></div>
+            <div class="col-4 p-4 mt-5 border rounded text-center bg-body-secondary">
+                <h3 class="display-4 mb-2">Profesor</h3>
+                <a role="button" href="#" class="btn btn-info">-></a>
+            </div>
+            <div class="col-1 mt-5"></div>
+
+            <div class="col-1 mt-5"></div>
+            <div class="col-4 p-4 mt-5 border rounded text-center bg-body-secondary">
+                <h3 class="display-4 mb-2">Admin</h3>
+                <a role="button" href="#" class="btn btn-info">-></a>
+            </div>
+            <div class="col-1 mt-5"></div>
+
+        </div>
+    </div>
+
+
+
+</body>
+</html>

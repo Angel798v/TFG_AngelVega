@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+
+<html th:lang="#{principal.lang}" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}" xmlns="http://www.w3.org/1999/html">
+
+	<head>
+		<meta th:charset="#{principal.charset}">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<title th:text="#{principal.title}"> </title>
+
+	</head>
+	<body>
+
+		<div layout:fragment="cabecera">
+			<h1 class="display-2" th:text="#{muestraAtributosUsuario.h1}"></h1>
+		</div>
+
+
+		<div layout:fragment="contenido">
+			<div class="container mt-5">
+
+				<!-- Mensaje de exito -->
+				<div th:if="${param.exito}">
+					<div class="alert alert-info"><span th:text="#{atributos.add.success}"> </span></div>
+				</div>
+
+				<!-- Mensaje de error -->
+				<div th:if="${param.fallo}">
+					<div class="alert alert-danger"><span th:text="#{atributos.add.fail}"></span></div>
+				</div>
+
+				<!-- Mensaje de eliminacion de atributos -->
+				<div th:if="${param.clear}">
+					<div class="alert alert-info"><span th:text="#{atributos.eliminados.correctamente}"></span></div>
+				</div>
+
+				<table class="table table-responsive table-bordered table-striped table-dark table-hover text-center border-secondary">
+
+					<thead>
+						<tr>
+							<td><strong th:text="#{atributos.nombre}"></strong></td>
+							<td><strong th:text="#{atributos.tipo}"></strong></td>
+							<td><strong th:text="#{atributos.primarykey}"></strong></td>
+							<td><strong th:text="#{atributos.unique}"></strong></td>
+							<td><strong th:text="#{atributos.nullable}"></strong></td>
+							<td><strong th:text="#{atributos.check}"></strong></td>
+							<td><strong th:text="#{atributos.default}"></strong></td>
+						</tr>
+					</thead>
+
+					<tbody>
+						<tr>
+							<td th:text="#{muestraAtributosUsuario.id}"></td>
+							<td th:text="'long'"></td>
+							<td th:text="'true'"></td>
+							<td th:text="'false'"></td>
+							<td th:text="'false'"></td>
+							<td th:text="'false'"></td>
+							<td th:text="'false'"></td>
+						</tr>
+						<tr>
+							<td th:text="#{muestraAtributosUsuario.username}"></td>
+							<td th:text="'String'"></td>
+							<td th:text="'false'"></td>
+							<td th:text="'true'"></td>
+							<td th:text="'false'"></td>
+							<td th:text="'false'"></td>
+							<td th:text="'false'"></td>
+						</tr>
+						<tr>
+							<td th:text="#{muestraAtributosUsuario.email}"></td>
+							<td th:text="'String'"></td>
+							<td th:text="'false'"></td>
+							<td th:text="'true'"></td>
+							<td th:text="'false'"></td>
+							<td th:text="'false'"></td>
+							<td th:text="'false'"></td>
+						</tr>
+						<tr>
+							<td th:text="#{muestraAtributosUsuario.password}"></td>
+							<td th:text="'String'"></td>
+							<td th:text="'false'"></td>
+							<td th:text="'false'"></td>
+							<td th:text="'false'"></td>
+							<td th:text="'false'"></td>
+							<td th:text="'false'"></td>
+						</tr>
+						<tr th:each="atributo : ${atributosUsuario}">
+							<td><span th:text="${atributo.nombre}"></span> </td>
+							<td><span th:text="${atributo.tipo}"></span></td>
+							<td><span th:text="${atributo.primaryKey}"></span></td>
+							<td><span th:text="${atributo.unique}"></span></td>
+							<td><span th:text="${atributo.nullable}"></span></td>
+							<td><span th:text="${atributo.check}"></span></td>
+							<td><span th:text="${atributo.defaultValue}"></span></td>
+						</tr>
+					</tbody>
+
+					<tfoot>
+						<tr>
+							<td><a role="button" class="btn btn-info" th:href="@{/addAtributoUsuario}" th:text="#{atributos.add}"></a></td>
+							<td><a role="button" class="btn btn-danger" th:href="@{/clearAtributosUsuario}" th:text="#{atributos.remove}"></a></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+						</tr>
+					</tfoot>
+
+				</table>
+				<span class="mt-2" th:text="#{muestraAtributosUsuario.info}"></span>
+
+
+				<div class="row mt-5">
+					<div class="col-10"></div>
+					<div class="col-2"><a class="btn btn-warning" role="button" th:href="@{/Generacion}" th:text="#{atributos.back}"></a></div>
+				</div>
+
+			</div>
+			<br><br>
+		</div>
+
+	</body>
+</html>
+

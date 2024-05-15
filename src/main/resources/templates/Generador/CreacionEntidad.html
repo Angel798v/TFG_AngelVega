@@ -1,0 +1,45 @@
+
+<!DOCTYPE html>
+
+<html th:lang="#{principal.lang}" xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{layout}" xmlns="http://www.w3.org/1999/html">
+
+	<head>
+		<meta th:charset="#{principal.charset}">
+		<title th:text="#{principal.title}"> </title>
+
+	</head>
+	<body>
+
+		<div layout:fragment="cabecera">
+			<h1 class="text-left" th:text="#{entidad.creacion}"></h1>
+
+		</div>
+
+
+		<div layout:fragment="contenido">
+			<div class="container">
+				<br><br>
+				<form th:action="@{/AddEntidad}" method="post" th:object="${entidad}">
+					<label for="nombreEntidad" class="control-label" th:text="#{entidad.introducir.nombre}"></label>
+					<input id="nombreEntidad" type="text" th:field="*{nombre}" required autofocus="autofocus">
+
+					<!-- Botón de confirmación -->
+					<br><br>
+					<div class="row justify-content-center">
+						<div class="col-md-10">
+							<button type="submit" class="btn btn-info" th:text="#{entidad.add}"></button>
+						</div>
+						<div class="col-md-2">
+							<a role="button" class="btn btn-danger" th:href="@{/Generacion}" th:text="#{entidad.cancelar}"></a>
+						</div>
+					</div>
+				</form>
+				<br><br>
+			</div>
+		</div>
+
+	</body>
+</html>
+

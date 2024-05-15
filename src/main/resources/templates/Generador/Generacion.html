@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+
+<html th:lang="#{principal.lang}" xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{layout}">
+
+<head>
+	<meta th:charset="#{principal.charset}">
+	<title th:text="#{principal.title}"> </title>
+</head>
+<body>
+
+	<div layout:fragment="cabecera">
+		<h1 class="display-2 mb-5" th:text="#{generacion.titulo}"></h1>
+
+	</div>
+
+
+	<div layout:fragment="contenido">
+		<div class="container">
+			<h3 class="mb-4" th:text="#{generacion.explicacion}"></h3>
+
+			<!-- Mensaje de exito de creacion de entidad -->
+			<div th:if="${param.exito}">
+				<div class="alert alert-info" th:text="#{generacion.param.exito}"></div>
+			</div>
+
+			<!-- Mensaje de error -->
+			<div th:if="${param.fallo}">
+				<div class="alert alert-danger" th:text="#{generacion.param.fallo}"></div>
+			</div>
+
+			<!-- Mensaje de exito de clear de entidades -->
+			<div th:if="${param.clear}">
+				<div class="alert alert-info" th:text="#{generacion.param.clear}"></div>
+			</div>
+
+			<!-- Mensaje de error -->
+			<div th:if="${param.error}">
+				<div class="alert alert-danger" th:text="#{generacion.param.error}"></div>
+			</div>
+
+			<!-- Mensaje de exito de creacion de relacion -->
+			<div th:if="${param.exitoRelacion}">
+				<div class="alert alert-info" th:text="#{generacion.param.exitoRelacion}"></div>
+			</div>
+
+			<!-- Mensaje de que existe la relacion -->
+			<div th:if="${param.existeRelacion}">
+				<div class="alert alert-danger" th:text="#{generacion.param.existeRelacion}"></div>
+			</div>
+
+			<!-- Mensaje de error de creacion de relacion -->
+			<div th:if="${param.errorRelacion}">
+				<div class="alert alert-danger" th:text="#{generacion.param.errorRelacion}"></div>
+			</div>
+
+			<table class="table table-responsive table-bordered table-striped table-dark table-hover text-center border-secondary">
+
+				<thead>
+					<tr>
+						<td><strong th:text="#{generacion.entidad.name}"></strong></td>
+						<td><strong th:text="#{generacion.atributos}"></strong></td>
+					</tr>
+				</thead>
+
+				<tbody>
+					<tr>
+						<td th:text="#{generacion.usuario}"></td>
+						<td><a role="button" class="btn btn-success" th:href="@{/atributosUsuario}" th:text="#{generacion.mostrar}"></a></td>
+					</tr>
+					<tr th:each="entidad :${entidades}">
+						<td><span th:text="${entidad.nombre}"></span> </td>
+						<td><a class="btn btn-success" role="button" th:href="@{/mostrarAtributos/} + ${entidad.nombre}" th:text="#{generacion.mostrar}"></a></td>
+					</tr>
+				</tbody>
+
+				<tfoot>
+					<tr>
+						<td><a role="button" th:href="@{/AddEntidad}" class="btn btn-info" th:text="#{generacion.addEntidad}"></a></td>
+						<td><a role="button" th:href="@{/ClearEntidades}" class="btn btn-danger" th:text="#{generacion.clear}"></a></td>
+					</tr>
+				</tfoot>
+
+			</table>
+
+			<br>
+			<hr class="divider mt-5 mb-5">
+
+			<div class="container mt-5 mb-5">
+				<h3 class="mb-4" th:text="#{generacion.relaciones.titulo}"></h3>
+
+				<table class="table table-responsive table-bordered table-striped table-dark table-hover text-center border-secondary">
+
+					<thead>
+						<tr>
+							<td><strong th:text="#{generacion.relaciones.primeraEntidad}"> </strong></td>
+							<td><strong th:text="#{generacion.relaciones.segundaEntidad}"> </strong></td>
+							<td><strong th:text="#{generacion.relaciones.cardinalidadA}"> </strong></td>
+							<td><strong th:text="#{generacion.relaciones.cardinalidadB}"> </strong></td>
+							<td><strong th:text="#{generacion.relaciones.bidireccional}"> </strong></td>
+						</tr>
+					</thead>
+
+					<tbody>
+						<tr th:each="relacion : ${relaciones}">
+							<td><span th:text="${relacion.getA().getNombre()}"></span> </td>
+							<td><span th:text="${relacion.getB().getNombre()}"></span> </td>
+							<td><span th:text="${relacion.getCardinalityA()}"></span> </td>
+							<td><span th:text="${relacion.getCardinalityB()}"></span> </td>
+							<td><span th:text="${relacion.isBidireccional()}"></span> </td>
+						</tr>
+					</tbody>
+
+					<tfoot>
+						<tr>
+							<td><a role="button" th:href="@{/creacionRelacion}" class="btn btn-info" th:text="#{generacion.relaciones.add}"></a></td>
+							<td><a role="button" th:href="@{/clearRelaciones}" class="btn btn-danger" th:text="#{generacion.relaciones.clear}"></a></td>
+							<td></td>
+							<td></td>
+							<td></td>
+						</tr>
+					</tfoot>
+
+				</table>
+
+				<br>
+			</div>
+		</div>
+
+		<hr class="divider mt-5 mb-5">
+
+		<h5 th:text="#{generacion.vistaCompacta}"></h5>
+		<p th:text="#{generacion.vistaCompacta.explicacion}"></p>
+		<ul>
+			<li th:text="#{generacion.vistaCompacta.li1}"></li>
+			<li th:text="#{generacion.vistaCompacta.li2}"></li>
+		</ul>
+		<br>
+		<div th:unless="${vistaCompacta}" class="container">
+			<p th:text="#{generacion.vistaCompacta} + ': ' + #{generacion.vistaCompacta.false}"></p>
+			<form th:action="@{/switchVistaCompacta}" method="POST"><button type="submit" class="btn btn-info" th:text="#{generacion.vistaCompacta.false.button}"></button></form>
+		</div>
+		<div th:if="${vistaCompacta}" class="container">
+			<p th:text="#{generacion.vistaCompacta} + ': ' + #{generacion.vistaCompacta.true}"></p>
+			<form th:action="@{/switchVistaCompacta}" method="POST"><button type="submit" class="btn btn-warning" th:text="#{generacion.vistaCompacta.true.button}"></button></form>
+		</div>
+
+
+
+		<br><br>
+		<div class="container row">
+			<div class="col-md-11"></div>
+			<div class="col-md-1">
+				<a role="button" class="btn btn-warning" th:href="@{/IndexGenerador}" th:text="#{generacion.inicio}"></a>
+			</div>
+		</div>
+		<br><br>
+	</div>
+
+</body>
+</html>
+

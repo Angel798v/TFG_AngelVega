@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html th:lang="#{principal.lang}"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <meta th:charset="#{principal.charset}">
+    <title th:text="#{principal.title}"></title>
+</head>
+<body>
+
+    <div class="container justify-content-center" layout:fragment="cabecera">
+        <h1 th:text="'Notas'"></h1>
+    </div>
+
+    <div class="container" layout:fragment="contenido">
+        <table class="table table-responsive">
+            <thead>
+                <tr>
+                    <td><strong th:text="'Id'"></strong></td>
+                    <td><strong th:text="'nombreAlumno'"></strong></td>
+                    <td><strong th:text="'nota'"></strong></td>
+                    <td><strong th:text="'Id_alumno'"></strong></td>
+                    <td><strong th:text="'Id_revision'"></strong></td>
+                    <td><strong th:text="'Id_profesor'"></strong></td>
+                    <td><strong th:text="'Id_usuario'"></strong></td>
+                    <td></td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="object : ${listAll}">
+                    <td th:text="${object.id}"></td>
+                    <td th:text="${object.nombreAlumno}"></td>
+                    <td th:text="${object.nota}"></td>
+                    <td th:if="${object.alumno.id}" th:text="${object.alumno.id}"></td>
+                    <td th:if="${object.revision.id}" th:text="${object.revision.id}"></td>
+                    <td th:if="${object.profesores}"><p th:each="suboject : ${object.profesores}" th:text="${suboject.toString()}"></p></td>
+                    <td th:if="${object.usuario}" th:text="${object.usuario}"></td>
+                    <td><a role="button" class="btn btn-info" th:href="@{/Notas/Put/} + ${object.id}" th:text="'Edit'"></a></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="row mt-4">
+            <div class="col-10"></div>
+            <div class="col-2"><a role="button" class="btn btn-warning" th:href="@{/Notas}" th:text="'Notas'"></a></div>
+        </div>
+    </div>
+
+</body>
+</html>

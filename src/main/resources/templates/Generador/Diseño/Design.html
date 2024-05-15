@@ -1,0 +1,75 @@
+
+<!DOCTYPE html>
+
+<html th:lang="#{principal.lang}" xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{layout}" xmlns="http://www.w3.org/1999/html">
+
+	<head>
+		<meta th:charset="#{principal.charset}">
+		<title th:text="#{principal.title}"> </title>
+
+	</head>
+	<body>
+
+		<div layout:fragment="cabecera">
+			<h1 class="display-2 mb-5" th:text="#{design.h1}"></h1>
+		</div>
+
+		<div layout:fragment="contenido">
+
+			<div class="row mb-4">
+				<p class="fw-semibold" th:text="#{design.colors.p}"></p>
+				<div class="col-3 text-center">
+					<p class="fst-italic" th:text="#{design.colors.principal}"></p>
+					<div class="row">
+						<div class="col-3"></div>
+						<div class="col-6" th:style="'height: 5rem; background-color: ' + ${colores.principalCodeColor} + ';'"></div>
+					</div>
+				</div>
+				<div class="col-3 text-center">
+					<p class="fst-italic" th:text="#{design.colors.secondary}"></p>
+					<div class="row">
+						<div class="col-3"></div>
+						<div class="col-6" th:style="'height: 5rem; background-color: ' + ${colores.secondaryCodeColor} + ';'"></div>
+					</div>
+				</div>
+			</div>
+
+			<a role="button" class="btn btn-info mt-4 mb-4" th:href="@{/colorPicker}" th:text="#{design.colors.colorPicker.button}"></a>
+
+			<hr class="divider mt-3 mb-3">
+
+			<div th:if="${nav}" class="py-4">
+				<span class="fw-semibold" th:text="#{design.switchNav.p} + '  '"></span><span class="fw-semibold fst-italic" th:text="#{design.switchNav.true.p}"></span><span class="fw-semibold" th:text="#{design.switchNav.final.p}"></span>
+				<form th:action="@{/switchNav}" method="POST"><button type="submit" class="btn btn-info mt-3" th:text="#{design.switchNav.true.button}"></button></form>
+			</div>
+			<div th:unless="${nav}" class="py-4">
+				<span class="fw-semibold" th:text="#{design.switchNav.p} + '  '"></span><span class="fw-semibold fst-italic" th:text="#{design.switchNav.false.p}"></span><span class="fw-semibold" th:text="#{design.switchNav.final.p}"></span>
+				<form th:action="@{/switchNav}" method="POST"><button type="submit" class="btn btn-info mt-3" th:text="#{design.switchNav.false.button}"></button></form>
+			</div>
+			<div class="row mt-3">
+				<div class="col-9">
+					<div class="row">
+						<div class="col-9">
+							<p th:text="#{design.switchNav.true.p}" class="fst-italic text-center fw-semibold"></p>
+						</div>
+					</div>
+					<img th:src="@{/images/navTrue.png}" height="200">
+				</div>
+				<div class="col-3">
+					<p th:text="#{design.switchNav.false.p}" class="fst-italic text-center fw-semibold"></p>
+					<img th:src="@{/images/navFalse.png}" height="350">
+				</div>
+			</div>
+
+
+			<div class="row mt-5">
+				<div class="col-10"></div>
+				<div class="col-2"><a role="button" class="btn btn-danger" th:href="@{/IndexGenerador}" th:text="#{design.index.button}"></a></div>
+			</div>
+
+		</div>
+	</body>
+</html>
+

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html th:lang="#{principal.lang}" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <meta th:charset="#{principal.charset}">
+    <title th:text="#{principal.title}"></title>
+</head>
+<body>
+
+    <div layout:fragment="header">
+        <div class="container mb-4">
+            <h1><strong th:text="#{principal.usuarios}"></strong></h1>
+        </div>
+    </div>
+
+    <div layout:fragment="content">
+
+        <div class="alert alert-info py-4 mb-3" th:if="${param.exito}" th:text="'Success'"></div>
+        <div class="alert alert-danger py-4 mb-3" th:if="${param.fallo}" th:text="'Failed'"></div>
+        <div class="alert alert-info py-4 mb-3" th:if="${param.exitoDelete}" th:text="'Success'"></div>
+
+        <div class="container">
+            <table class="table table-bordered table-responsive">
+                <thead>
+                    <tr>
+                        <td><strong><span th:text="#{principal.username}"></span></strong></td>
+                        <td><strong><span th:text="#{principal.email}"></span></strong></td>
+                        <td><strong><span th:text="#{principal.rol}"></span></strong></td>
+                        <td><strong><span th:text="'direccion'"></span></strong></td>
+                        <td><strong><span th:text="'apellidos'"></span></strong></td>
+                        <td></td>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr th:each="usuario: ${usuarios}">
+                        <td th:text="${usuario.username}"></td>
+                        <td th:text="${usuario.email}"></td>
+                        <td th:text="${usuario.role.roleName}"></td>
+                        <td th:text="${usuario.direccion}"></td>
+                        <td th:text="${usuario.apellidos}"></td>
+                        <td><form th:action="@{/usuarios/delete/} + ${usuario.id}" method="POST"><button type="submit" class="btn btn-danger" th:text="#{delete.button}"></button></form></td>                    </tr>
+                </tbody>
+
+            </table>
+        </div>
+
+        <div class="container py-3"><a role="button" class="btn btn-info" th:href="@{/usuarios/registry}" th:text="#{principal.registrarUsuario}"></a></div>
+
+        <br><br>
+
+        <br><br>
+
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html th:lang="#{principal.lang}"  xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <meta th:charset="#{principal.charset}">
+    <title th:text="#{principal.title}"></title>
+</head>
+<body>
+
+
+    <div class="container" layout:fragment="cabecera">
+        <h1 th:text="#{addRol.encabezado}"></h1>
+    </div>
+
+    <div class="container py-5" layout:fragment="contenido">
+
+        <form th:action="@{/addRole}" method="POST" th:object="${rol}">
+
+            <div class="input-group mt-1 py-2">
+                <label for="role_id" class="control-label input-group-text" th:text="#{addRol.identificador.label}"></label>
+                <input id="role_id" class="form-control" type="number" th:field="*{id}">
+            </div>
+            <p th:text="#{addRol.identificador.text}"></p>
+
+            <div class="input-group py-2">
+                <label for="role_name" class="control-label input-group-text" th:text="#{addRol.nombreRol}"></label>
+                <input id="role_name" class="form-control" type="text" th:field="*{roleName}">
+            </div>
+
+            <div class="row mt-5">
+                <div class="col-11">
+                    <button type="submit" class="btn btn-success" th:text="#{addRol.registrar.button}"></button>
+                </div>
+                <div class="col-1">
+                    <a role="button" class="btn btn-danger" th:href="@{/SecurityProperties}" th:text="#{addRol.cancel.button}"></a>
+                </div>
+            </div>
+
+        </form>
+
+    </div>
+
+</body>
+</html>

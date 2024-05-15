@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html th:lang="#{principal.lang}"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}" xmlns:form="http://www.w3.org/1999/html">
+<head>
+    <meta th:charset="#{principal.charset}">
+    <title th:text="#{principal.title}"></title>
+</head>
+<body>
+
+    <div layout:fragment="cabecera" class="mb-5">
+        <h1 class="display-1" th:text="#{idiomas}"></h1>
+    </div>
+
+    <div layout:fragment="contenido" class="container">
+
+
+        <div class="py-4 mt-5">
+            <h3 th:text="#{idiomas.explicacion} + ':'"></h3>
+            <br>
+
+            <div class="py-4" th:if="${param.exito}"><span class="alert alert-info" th:text="#{idiomas.param.exito}"></span></div>
+            <div class="py-4" th:if="${param.fallo}"><span class="alert alert-danger" th:text="#{idiomas.param.fallo}"></span></div>
+            <div class="py-4" th:if="${param.falloAbreviatura}"><span class="alert alert-danger" th:text="#{idiomas.param.falloAbreviatura}"></span></div>
+            <div class="py-4" th:if="${param.exitoIdiomaDefault}"><span class="alert alert-info" th:text="#{idiomas.param.exitoIdiomaDefault}"></span></div>
+            <div class="py-4" th:if="${param.clearIdiomas}"><span class="alert alert-warning" th:text="#{idiomas.param.clearIdiomas}"></span></div>
+
+            <table class="table table-responsive table-bordered table-striped table-dark table-hover text-center border-secondary">
+                <thead>
+                    <tr>
+                        <td><strong  th:text="#{idiomas.numero}"></strong></td>
+                        <td><strong th:text="#{idiomas.idioma}"></strong></td>
+                        <td><strong th:text="#{idiomas.abreviatura}"></strong></td>
+                        <td><strong th:text="#{idiomas.vista}"></strong></td>
+                        <td><strong th:text="#{idiomas.edicion}"></strong></td>
+                        <td><strong th:text="#{idiomas.creacion}"></strong></td>
+                        <td><strong th:text="#{idiomas.eliminacion}"></strong></td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="idioma,iterStat : ${idiomas}">
+                        <td th:text="${iterStat.count}"></td>
+                        <td th:text="${idioma.getNombreIdioma()}"></td>
+                        <td th:text="${idioma.abreviatura}"></td>
+                        <td th:text="${idioma.button_GET}"></td>
+                        <td th:text="${idioma.button_POST}"></td>
+                        <td th:text="${idioma.button_PUT}"></td>
+                        <td th:text="${idioma.button_DELETE}"></td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td><a role="button" class="btn btn-info" th:href="@{/creacionIdioma}" th:text="#{idiomas.addIdioma}"></a></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td><a role="button" class="btn btn-danger" th:href="@{/clearIdiomas}" th:text="#{idiomas.clearIdiomas}"></a></td>
+                    </tr>
+                </tfoot>
+            </table>
+
+
+            <div class="container py-3 mt-5" th:if="${idiomaDefault}">
+                <div class="row">
+                    <div class="col-4"><strong><p th:text="#{idiomas.idiomaDefault.p} + ' ' + ${idiomaDefault.nombreIdioma} + ' - ' + ${idiomaDefault.abreviatura}"></p></strong></div>
+                    <div class="col-4"><a role="button" class="btn btn-info" th:href="@{/setIdiomaDefault}" th:text="#{idiomas.idiomaDefault.modify.button}"></a></div>
+                </div>
+            </div>
+
+            <div class="container py-3 mt-5 mb-5" th:unless="${idiomaDefault}">
+                <div class="row">
+                    <div class="col-4"><p th:text="#{idiomas.idiomaDefault.false.p}"></p></div>
+                    <div class="col-4"><a role="button" class="btn btn-success" th:href="@{/setIdiomaDefault}" th:text="#{idiomas.idiomaDefault.false.button}"></a></div>
+                </div>
+            </div>
+
+            <div class="row mt-5">
+                <div class="col-md-11">
+
+                </div>
+                <div class="col-md-1">
+                    <a role="button" class="btn btn-warning" th:href="@{/IndexGenerador}" th:text="#{idiomas.inicio}"></a>
+                </div>
+            </div>
+        </div>
+        <br><br>
+    </div>
+
+</body>
+</html>
