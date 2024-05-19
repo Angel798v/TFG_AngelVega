@@ -52,12 +52,6 @@
 						<a class="nav-link" th:href="@{/usuarios}"><strong th:text="#{index.usuarios}"></strong></a>
 					</li>
 
-					<li sec:authorize="isAuthenticated()" class="nav-item ms-3">
-						<a class="nav-link" th:href="@{/logout}"><strong th:text="#{logout}"></strong></a>
-					</li>
-					<li sec:authorize="isAnonymous()" class="nav-item ms-3">
-						<a class="nav-link" th:href="@{/login}"><strong th:text="#{login}"></strong></a>
-					</li>
 				</ul>
 			</div>
 
@@ -73,19 +67,24 @@
 					<li>
 						<a class="dropdown-item" th:href="@{/redirectEn}"><img th:src="@{/images/uk.jpeg}" alt="" height="20"><strong>&nbsp&nbsp <span th:text="#{principal.ingles}"></span></strong></a>
 					</li>
+
 				</ul>
 
 			</div>
 
+			<div sec:authorize="isAuthenticated()" class="nav-item ms-3 mx-3">
+				<a class="nav-link" th:href="@{/logout}"><strong th:text="#{logout}"></strong></a>
+			</div>
+			<div sec:authorize="isAnonymous()" class="nav-item ms-3 mx-3">
+				<a class="nav-link" th:href="@{/login}"><strong th:text="#{login}"></strong></a>
+			</div>
 
 			<div class="nav-item dropdown me-4">
-
 				<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"><img th:src="@{/images/acceso.png}" alt="" height="30"></a>
-
 				<ul class="dropdown-menu text-center" style="background-color: #8298a0;">
-					<li><a class="dropdown-item" th:href="@{/loginlogout}"><strong th:text="#{layout.loginlogout}"></strong></a></li>
+					<li><span sec:authorize="isAuthenticated()" class="dropdown-item fw-bold" sec:authentication="name"></span></li>
+					<li><a sec:authorize="isAnonymous()" class="dropdown-item" th:href="@{/login}"><strong th:text="#{login}"></strong></a></li>
 				</ul>
-
 			</div>
 
 		</div>

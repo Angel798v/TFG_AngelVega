@@ -8,9 +8,14 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class ColorPicker {
+@NoArgsConstructor
+public class ColorPick {
 
     private String principalCodeColor;
 
     private String secondaryCodeColor;
+
+    private String tertiaryCodeColor;
+
+    private boolean textDark;
 }

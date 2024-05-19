@@ -1,18 +1,15 @@
-package com.example.workshop.dto;
+package com.example.generador.util;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class RoleDto {
-
-	private int id;
-
-	private String roleName;
+@Getter
+@Setter
+public class PaletteColorPick {
+    private String eleccion;
 
 }

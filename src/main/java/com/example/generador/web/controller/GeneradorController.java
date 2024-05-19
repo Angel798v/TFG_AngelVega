@@ -3,19 +3,30 @@ package com.example.generador.web.controller;
 import com.example.generador.dto.*;
 import com.example.generador.model.Project;
 import com.example.generador.service.*;
-import com.example.generador.util.ColorPicker;
+import com.example.generador.util.ColorPick;
 import com.example.generador.util.UsuarioAdminCredentials;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponseWrapper;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.neo4j.Neo4jProperties;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
+import java.io.*;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 @Controller
 public class GeneradorController {
@@ -203,18 +214,86 @@ public class GeneradorController {
      * @return Vista instrucciones post-descarga
      */
     @PostMapping("/GenerateApplication")
-    public String generateApplication() throws Exception{
+    public void generateApplication(HttpServletResponse response) throws Exception{
 
         try {
 
+            //Generación proyecto
+
             generadorService.createDirectories();
             generadorService.createDocs();
+
+            //Compresión proyecto
+
+            String sourceFile = projectService.getTitleProject();
+            FileOutputStream fos = new FileOutputStream(projectService.getTitleProject() + ".zip");
+            ZipOutputStream zipOut = new ZipOutputStream(fos);
+
+            File fileToZip = new File(sourceFile);
+            zipFile(fileToZip, fileToZip.getName(), zipOut);
+            zipOut.close();
+            fos.close();
+
+            //Descarga proyecto comprimido
+
+            response.setContentType("application/zip");
+            response.setHeader("Content-Disposition", "attachment;filename=" + projectService.getTitleProject() + ".zip");
+            response.setStatus(HttpServletResponse.SC_OK);
+
+            InputStream is = new FileInputStream(projectService.getTitleProject() + ".zip");
+            IOUtils.copy(is, response.getOutputStream());
+
+            response.flushBuffer();
+
+            /*
+            ZipOutputStream zippedOut = new ZipOutputStream(response.getOutputStream());
+
+            FileSystemResource resource = new FileSystemResource(file);
+
+            ZipEntry e = new ZipEntry(resource.getFilename());
+            e.setSize(resource.contentLength());
+            e.setTime(System.currentTimeMillis());
+            zippedOut.putNextEntry(e);
+            StreamUtils.copy(resource.getInputStream(), zippedOut);
+            zippedOut.closeEntry();
+
+            zippedOut.finish();
+            */
 
         }catch (Exception ex){
             throw new Exception(ex.getMessage());
         }
 
-        return "redirect:/IndexGenerador";
+        //return "redirect:/IndexGenerador";
+    }
+
+    private static void zipFile(File fileToZip, String fileName, ZipOutputStream zipOut) throws IOException {
+        if (fileToZip.isHidden()) {
+            return;
+        }
+        if (fileToZip.isDirectory()) {
+            if (fileName.endsWith("/")) {
+                zipOut.putNextEntry(new ZipEntry(fileName));
+                zipOut.closeEntry();
+            } else {
+                zipOut.putNextEntry(new ZipEntry(fileName + "/"));
+                zipOut.closeEntry();
+            }
+            File[] children = fileToZip.listFiles();
+            for (File childFile : children) {
+                zipFile(childFile, fileName + "/" + childFile.getName(), zipOut);
+            }
+            return;
+        }
+        FileInputStream fis = new FileInputStream(fileToZip);
+        ZipEntry zipEntry = new ZipEntry(fileName);
+        zipOut.putNextEntry(zipEntry);
+        byte[] bytes = new byte[1024];
+        int length;
+        while ((length = fis.read(bytes)) >= 0) {
+            zipOut.write(bytes, 0, length);
+        }
+        fis.close();
     }
 
 
@@ -255,15 +334,15 @@ public class GeneradorController {
         atributosService.addAtributo(reparacion,pk_reparacion);
 
         //Relaciones
-        Relacion reparacion_mecanico = new Relacion(reparacion,mecanico,"N","0..1",true);
+        Relacion reparacion_mecanico = new Relacion(reparacion,mecanico,"N","0..1",true, true);
         reparacion_mecanico.setNameA(reparacion.getNombre());
         reparacion_mecanico.setNameB(mecanico.getNombre());
 
-        Relacion reparacion_cliente = new Relacion(reparacion,cliente,"N","0..1",false);
+        Relacion reparacion_cliente = new Relacion(reparacion,cliente,"N","0..1",false, true);
         reparacion_cliente.setNameA(reparacion.getNombre());
         reparacion_cliente.setNameB(cliente.getNombre());
 
-        Relacion reparacion_tipoServicio = new Relacion(reparacion,tipo_servicio,"N","M",true);
+        Relacion reparacion_tipoServicio = new Relacion(reparacion,tipo_servicio,"N","M",true, false);
         reparacion_tipoServicio.setNameA(reparacion.getNombre());
         reparacion_tipoServicio.setNameB(tipo_servicio.getNombre());
 
@@ -342,7 +421,7 @@ public class GeneradorController {
         rolesService.setDefaultRole(user);
 
         //DISEÑO
-        designService.setColores(new ColorPicker("#8ED8F1","#FFFFFF"));
+        designService.setColores(new ColorPick("#8ED8F1","#FFFFFF", "#FEF9C7",false));
         designService.switchNav();
 
 

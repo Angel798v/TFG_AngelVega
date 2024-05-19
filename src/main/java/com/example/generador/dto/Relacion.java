@@ -35,6 +35,12 @@ public class Relacion {
      */
     private boolean bidireccional;
 
+    /**
+     * Indica si al eliminar alguna entrada de la futura tabla no propietaria, hace borrado en cascada o no
+     */
+    @Setter
+    private boolean cascade;
+
 
     /**
      * Nombre de la entidad A
@@ -55,7 +61,7 @@ public class Relacion {
      * @param A Cardinalidad de la primera entidad de la relación
      * @param B Cardinalidad de la segunda entidad de la relación
      */
-    public Relacion(EntidadDto A, EntidadDto B, String cardinalityA, String cardinalityB, boolean bidireccional){
+    public Relacion(EntidadDto A, EntidadDto B, String cardinalityA, String cardinalityB, boolean bidireccional, boolean cascade){
 
         this.A = A;
         this.B = B;
@@ -69,6 +75,7 @@ public class Relacion {
         }
 
         this.bidireccional = bidireccional;
+        this.cascade = cascade;
     }
 
 

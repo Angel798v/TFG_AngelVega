@@ -10,7 +10,7 @@
 <body>
 
     <div layout:fragment="cabecera">
-        <h1 th:text="#{relacion.creacion}"></h1>
+        <h1 class="display-3" th:text="#{relacion.creacion}"></h1>
         <br>
         <h3 th:text="#{relacion.creacion.explicacion}"></h3>
     </div>
@@ -53,11 +53,19 @@
 
                 <br><br>
 
-                <h5 th:text="#{relacion.bidireccional.explicacion}"> </h5>
-                <div class="form-check">
+                <p th:text="#{relacion.bidireccional.explicacion}"> </p>
+                <div class="form-check mb-5">
                     <input class="form-check-input" type="checkbox" id="checkBidireccionalidad" th:field="*{bidireccional}">
                     <label class="form-check-label" for="checkBidireccionalidad" th:text="#{relacion.bidireccional}"></label>
                 </div>
+
+                <p th:text="#{relacion.cascade.explicacion}"> </p>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="checkCascade" th:field="*{cascade}">
+                    <label class="form-check-label" for="checkCascade" th:text="#{relacion.cascade}"></label>
+                </div>
+                <div class="alert alert-danger mt-3" th:text="#{relacion.cascade.info}"></div>
+
             </div>
             <br>
             <div class="container row justify-content-center">

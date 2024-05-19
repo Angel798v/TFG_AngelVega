@@ -94,21 +94,23 @@
 
 					<thead>
 						<tr>
-							<td><strong th:text="#{generacion.relaciones.primeraEntidad}"> </strong></td>
-							<td><strong th:text="#{generacion.relaciones.segundaEntidad}"> </strong></td>
-							<td><strong th:text="#{generacion.relaciones.cardinalidadA}"> </strong></td>
-							<td><strong th:text="#{generacion.relaciones.cardinalidadB}"> </strong></td>
-							<td><strong th:text="#{generacion.relaciones.bidireccional}"> </strong></td>
+							<td><strong th:text="#{generacion.relaciones.primeraEntidad}"></strong></td>
+							<td><strong th:text="#{generacion.relaciones.segundaEntidad}"></strong></td>
+							<td><strong th:text="#{generacion.relaciones.cardinalidadA}"></strong></td>
+							<td><strong th:text="#{generacion.relaciones.cardinalidadB}"></strong></td>
+							<td><strong th:text="#{generacion.relaciones.bidireccional}"></strong></td>
+							<td><strong th:text="#{generacion.relaciones.cascade}"></strong></td>
 						</tr>
 					</thead>
 
 					<tbody>
 						<tr th:each="relacion : ${relaciones}">
-							<td><span th:text="${relacion.getA().getNombre()}"></span> </td>
-							<td><span th:text="${relacion.getB().getNombre()}"></span> </td>
-							<td><span th:text="${relacion.getCardinalityA()}"></span> </td>
-							<td><span th:text="${relacion.getCardinalityB()}"></span> </td>
-							<td><span th:text="${relacion.isBidireccional()}"></span> </td>
+							<td><span th:text="${relacion.getA().getNombre()}"></span></td>
+							<td><span th:text="${relacion.getB().getNombre()}"></span></td>
+							<td><span th:text="${relacion.getCardinalityA()}"></span></td>
+							<td><span th:text="${relacion.getCardinalityB()}"></span></td>
+							<td><span th:text="${relacion.isBidireccional()}"></span></td>
+							<td><span th:text="${relacion.isCascade()}"></span></td>
 						</tr>
 					</tbody>
 
@@ -116,6 +118,7 @@
 						<tr>
 							<td><a role="button" th:href="@{/creacionRelacion}" class="btn btn-info" th:text="#{generacion.relaciones.add}"></a></td>
 							<td><a role="button" th:href="@{/clearRelaciones}" class="btn btn-danger" th:text="#{generacion.relaciones.clear}"></a></td>
+							<td></td>
 							<td></td>
 							<td></td>
 							<td></td>
@@ -146,7 +149,11 @@
 			<form th:action="@{/switchVistaCompacta}" method="POST"><button type="submit" class="btn btn-warning" th:text="#{generacion.vistaCompacta.true.button}"></button></form>
 		</div>
 
+		<hr class="divider mt-5 mb-5">
 
+		<div>
+
+		</div>
 
 		<br><br>
 		<div class="container row">

@@ -2,15 +2,15 @@ package com.example.generador.web.controller;
 
 import com.example.generador.service.DesignService;
 import com.example.generador.service.UrlService;
-import com.example.generador.util.ColorPicker;
+import com.example.generador.util.ColorPick;
+import com.example.generador.util.PaletteColorPick;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-
-import java.awt.*;
 
 @Controller
 public class DesignController {
@@ -33,7 +33,7 @@ public class DesignController {
         urlService.setUrl("/Design");
 
         if(designService.getColores() == null){
-            designService.setColores(new ColorPicker("#8ED8F1","#FFFFFF"));
+            designService.setColores(new ColorPick("#8ED8F1","#FFFFFF", "#FEF9C7",true));
             model.addAttribute("colores",designService.getColores());
         }else{
             model.addAttribute("colores",designService.getColores());
@@ -47,13 +47,19 @@ public class DesignController {
 
     /**
      * Vista que permite seleccionar los colores principales de la aplicación a generar.
-     * @param colorPicker Objeto ColorPicker
+     * @param model Model
      * @return Vista
      */
     @GetMapping("/colorPicker")
-    public String vistaColorPicker(@ModelAttribute("colorPicker")ColorPicker colorPicker){
+    public String vistaColorPicker(Model model){
 
         urlService.setUrl("/colorPicker");
+
+        ColorPick initialColorPick = new ColorPick();
+        initialColorPick.setTextDark(false);
+        model.addAttribute("colorPicker", initialColorPick);
+
+        model.addAttribute("paletteColorPick", new PaletteColorPick());
 
         return "Generador/Diseño/ColorPicker";
     }
@@ -61,13 +67,42 @@ public class DesignController {
 
     /**
      * Método que establece los colores principales de la aplicación a generar.
-     * @param colorPicker Objeto ColorPicker
+     * @param colorPick Objeto ColorPick
      * @return Vista design
      */
     @PostMapping("/colorPicker")
-    public String colorPicker(ColorPicker colorPicker){
+    public String colorPicker(ColorPick colorPick){
 
-        designService.setColores(colorPicker);
+        designService.setColores(colorPick);
+
+        System.out.println(colorPick.isTextDark());
+
+        return "redirect:/Design";
+    }
+
+    @GetMapping("/predefinedColorPicker/{eleccion}")
+    public String predefinedColorPicker(@PathVariable(name = "eleccion") String paletteColorPick){
+
+        ColorPick colorPick;
+
+        switch (paletteColorPick){
+            case "primera":
+                colorPick = new ColorPick("#026670","#FEF9C7","#9FEDD7", true);
+                break;
+            case "segunda":
+                colorPick = new ColorPick("#1F2833","#C5C6C7","#66FCF1", true);
+                break;
+            case "tercera":
+                colorPick = new ColorPick("#E98074","#EAE7DC","#D8C3A5", true);
+                break;
+            case "cuarta":
+                colorPick = new ColorPick("#FAED26","#9D8D8F","#5A5560", false);
+                break;
+            default:
+                colorPick = designService.getColores();
+        }
+
+        designService.setColores(colorPick);
 
         return "redirect:/Design";
     }

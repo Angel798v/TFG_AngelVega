@@ -34,6 +34,22 @@
 						<div class="col-6" th:style="'height: 5rem; background-color: ' + ${colores.secondaryCodeColor} + ';'"></div>
 					</div>
 				</div>
+				<div class="col-3 text-center">
+					<p class="fst-italic" th:text="#{design.colors.tertiary}"></p>
+					<div class="row">
+						<div class="col-3"></div>
+						<div class="col-6" th:style="'height: 5rem; background-color: ' + ${colores.tertiaryCodeColor} + ';'"></div>
+					</div>
+				</div>
+
+				<div th:unless="${colores.textDark}" class="form-check form-switch mt-5">
+					<input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDisabled" disabled>
+					<label class="form-check-label" for="flexSwitchCheckDisabled" th:text="#{colorPicker.check}"></label>
+				</div>
+				<div th:if="${colores.textDark}" class="form-check form-switch mt-5">
+					<input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckCheckedDisabled" checked disabled>
+					<label class="form-check-label" for="flexSwitchCheckCheckedDisabled" th:text="#{colorPicker.check}"></label>
+				</div>
 			</div>
 
 			<a role="button" class="btn btn-info mt-4 mb-4" th:href="@{/colorPicker}" th:text="#{design.colors.colorPicker.button}"></a>

@@ -13,7 +13,7 @@
 	<body>
 
 		<div layout:fragment="cabecera">
-			<h1 class="display-2 mb-3" th:text="#{colorPicker.h1}"></h1>
+			<h1 class="display-2 mb-5" th:text="#{colorPicker.h1}"></h1>
 		</div>
 
 
@@ -21,23 +21,182 @@
 
 			<form th:action="@{/colorPicker}" method="POST" th:object="${colorPicker}">
 
+				<h2 class="display-5 mt-3 mb-3" th:text="#{colorPicker.h2}"></h2>
+
 				<div class="row">
-					<div class="col-6">
+					<div class="col-4">
 						<label for="principalCodeColor" class="form-label" th:text="#{colorPicker.principal.label}"></label>
-						<input type="color" class="form-control form-control-color" id="principalCodeColor" value="#8ED8F1" title="Choose a color" th:field="*{principalCodeColor}">
+						<input type="color" class="form-control form-control-color" id="principalCodeColor" value="#8ED8F1" th:field="*{principalCodeColor}">
 					</div>
-					<div class="col-6">
-						<label for="myColor" class="form-label" th:text="#{colorPicker.secondary.label}"></label>
-						<input type="color" class="form-control form-control-color" id="myColor" value="#8ED8F1" title="Choose a color" th:field="*{secondaryCodeColor}">
+					<div class="col-4">
+						<label for="secondaryCodeColor" class="form-label" th:text="#{colorPicker.secondary.label}"></label>
+						<input type="color" class="form-control form-control-color" id="secondaryCodeColor" value="#8ED8F1" th:field="*{secondaryCodeColor}">
+					</div>
+					<div class="col-4">
+						<label for="tertiaryCodeColor" class="form-label" th:text="#{colorPicker.tertiary.label}"></label>
+						<input type="color" class="form-control form-control-color" id="tertiaryCodeColor" value="#8ED8F1" th:field="*{tertiaryCodeColor}">
 					</div>
 				</div>
+
+				<div class="form-check form-switch mt-5">
+					<input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault" th:field="*{textDark}">
+					<label class="form-check-label" for="flexSwitchCheckDefault" th:text="#{colorPicker.check}"></label>
+				</div>
+				<p class="fw-bold" th:text="#{colorPicker.check.p}"></p>
 
 				<div class="row mt-5">
 					<div class="col-10"><button type="submit" class="btn btn-success mt-3" th:text="#{colorPicker.save.button}"></button></div>
-					<div class="col-2"><a role="button" class="btn btn-danger" th:href="@{/Design}" th:text="#{colorPicker.cancel.button}"></a></div>
+					<!--<div class="col-2"><a role="button" class="btn btn-danger" th:href="@{/Design}" th:text="#{colorPicker.cancel.button}"></a></div>-->
 				</div>
 
 			</form>
+
+			<hr class="py-3 mt-5">
+
+			<h2 class="display-5" th:text="#{colorPicker.paletas.h2}"></h2>
+			<p class="fw-bold" th:text="#{colorPicker.paletas.p}"></p>
+
+			<!-- Primera paleta -->
+			<div class="row mb-4">
+				<p class="fw-semibold" th:text="#{colorPicker.paletas.paleta1.p}"></p>
+				<div class="col-3 text-center">
+					<p class="fst-italic" th:text="#{design.colors.principal}"></p>
+					<div class="row">
+						<div class="col-3"></div>
+						<div class="col-6" style="height: 5rem; background-color: #026670"></div>
+					</div>
+				</div>
+				<div class="col-3 text-center">
+					<p class="fst-italic" th:text="#{design.colors.secondary}"></p>
+					<div class="row">
+						<div class="col-3"></div>
+						<div class="col-6" style="height: 5rem; background-color: #FEF9C7"></div>
+					</div>
+				</div>
+				<div class="col-3 text-center">
+					<p class="fst-italic" th:text="#{design.colors.tertiary}"></p>
+					<div class="row">
+						<div class="col-3"></div>
+						<div class="col-6" style="height: 5rem; background-color: #9FEDD7"></div>
+					</div>
+				</div>
+				<div class="form-check form-switch mt-5">
+					<input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckCheckedDisabled" checked disabled>
+					<label class="form-check-label" for="flexSwitchCheckCheckedDisabled" th:text="#{colorPicker.check}"></label>
+				</div>
+				<div>
+					<a role="button" class="btn btn-success mt-4" th:href="@{/predefinedColorPicker/} + 'primera'" th:text="#{colorPicker.paletas.paleta1.button}"></a>
+				</div>
+			</div>
+
+			<!-- Segunda paleta -->
+			<div class="row mb-4">
+				<p class="fw-semibold" th:text="#{colorPicker.paletas.paleta2.p}"></p>
+				<div class="col-3 text-center">
+					<p class="fst-italic" th:text="#{design.colors.principal}"></p>
+					<div class="row">
+						<div class="col-3"></div>
+						<div class="col-6" style="height: 5rem; background-color: #1F2833"></div>
+					</div>
+				</div>
+				<div class="col-3 text-center">
+					<p class="fst-italic" th:text="#{design.colors.secondary}"></p>
+					<div class="row">
+						<div class="col-3"></div>
+						<div class="col-6" style="height: 5rem; background-color: #C5C6C7"></div>
+					</div>
+				</div>
+				<div class="col-3 text-center">
+					<p class="fst-italic" th:text="#{design.colors.tertiary}"></p>
+					<div class="row">
+						<div class="col-3"></div>
+						<div class="col-6" style="height: 5rem; background-color: #66FCF1"></div>
+					</div>
+				</div>
+				<div class="form-check form-switch mt-5">
+					<input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckCheckedDisabled2" checked disabled>
+					<label class="form-check-label" for="flexSwitchCheckCheckedDisabled2" th:text="#{colorPicker.check}"></label>
+				</div>
+				<div>
+					<a role="button" class="btn btn-success mt-4" th:href="@{/predefinedColorPicker/} + 'segunda'" th:text="#{colorPicker.paletas.paleta2.button}"></a>
+				</div>
+			</div>
+
+			<!-- Tercera paleta -->
+			<div class="row mb-4">
+				<p class="fw-semibold" th:text="#{colorPicker.paletas.paleta3.p}"></p>
+				<div class="col-3 text-center">
+					<p class="fst-italic" th:text="#{design.colors.principal}"></p>
+					<div class="row">
+						<div class="col-3"></div>
+						<div class="col-6" style="height: 5rem; background-color: #E98074"></div>
+					</div>
+				</div>
+				<div class="col-3 text-center">
+					<p class="fst-italic" th:text="#{design.colors.secondary}"></p>
+					<div class="row">
+						<div class="col-3"></div>
+						<div class="col-6" style="height: 5rem; background-color: #EAE7DC"></div>
+					</div>
+				</div>
+				<div class="col-3 text-center">
+					<p class="fst-italic" th:text="#{design.colors.tertiary}"></p>
+					<div class="row">
+						<div class="col-3"></div>
+						<div class="col-6" style="height: 5rem; background-color: #D8C3A5"></div>
+					</div>
+				</div>
+				<div class="form-check form-switch mt-5">
+					<input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckCheckedDisabled3" checked disabled>
+					<label class="form-check-label" for="flexSwitchCheckCheckedDisabled3" th:text="#{colorPicker.check}"></label>
+				</div>
+				<div>
+					<a role="button" class="btn btn-success mt-4" th:href="@{/predefinedColorPicker/} + 'tercera'" th:text="#{colorPicker.paletas.paleta3.button}"></a>
+				</div>
+			</div>
+
+			<!-- Cuarta paleta -->
+			<div class="row mb-4">
+				<p class="fw-semibold" th:text="#{colorPicker.paletas.paleta4.p}"></p>
+				<div class="col-3 text-center">
+					<p class="fst-italic" th:text="#{design.colors.principal}"></p>
+					<div class="row">
+						<div class="col-3"></div>
+						<div class="col-6" style="height: 5rem; background-color: #FAED26"></div>
+					</div>
+				</div>
+				<div class="col-3 text-center">
+					<p class="fst-italic" th:text="#{design.colors.secondary}"></p>
+					<div class="row">
+						<div class="col-3"></div>
+						<div class="col-6" style="height: 5rem; background-color: #9D8D8F"></div>
+					</div>
+				</div>
+				<div class="col-3 text-center">
+					<p class="fst-italic" th:text="#{design.colors.tertiary}"></p>
+					<div class="row">
+						<div class="col-3"></div>
+						<div class="col-6" style="height: 5rem; background-color: #5A5560"></div>
+					</div>
+				</div>
+				<div class="form-check form-switch mt-5">
+					<input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckCheckedDisabled4" disabled>
+					<label class="form-check-label" for="flexSwitchCheckCheckedDisabled4" th:text="#{colorPicker.check}"></label>
+				</div>
+				<div>
+					<a role="button" class="btn btn-success mt-4" th:href="@{/predefinedColorPicker/} + 'cuarta'" th:text="#{colorPicker.paletas.paleta4.button}"></a>
+				</div>
+			</div>
+
+
+			<div class="row mt-5">
+				<div class="col-10"><button type="submit" class="btn btn-success mt-3" th:text="#{colorPicker.save.button}"></button></div>
+				<div class="col-2"><a role="button" class="btn btn-danger" th:href="@{/Design}" th:text="#{colorPicker.cancel.button}"></a></div>
+			</div>
+
+
+
+
 		</div>
 	</body>
 </html>

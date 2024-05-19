@@ -1,6 +1,6 @@
 package com.example.generador.service;
 
-import com.example.generador.util.ColorPicker;
+import com.example.generador.util.ColorPick;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.stereotype.Service;
@@ -10,7 +10,7 @@ public class DesignService {
 
     @Getter
     @Setter
-    private ColorPicker colores;
+    private ColorPick colores;
 
     /**
      * Booleano que indica true si el diseño va a disponer de nav, false en caso de que disponga de barra lateral.
@@ -24,5 +24,8 @@ public class DesignService {
     public void switchNav(){
         nav = !nav;
     }
+
+
+
 
 }

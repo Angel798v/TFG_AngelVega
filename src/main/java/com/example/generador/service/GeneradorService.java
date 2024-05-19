@@ -2,7 +2,7 @@ package com.example.generador.service;
 
 import com.example.generador.dto.*;
 import com.example.generador.exceptions.*;
-import com.example.generador.util.ColorPicker;
+import com.example.generador.util.ColorPick;
 import com.example.generador.util.UsuarioAdminCredentials;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -310,7 +310,11 @@ public class GeneradorService {
                     }
                 }else if(relacion.getB() == entidad && relacion.isBidireccional()){
                     if(relacion.getCardinalityA().equals("N") && relacion.getCardinalityB().equals("M")) {	//Many to many
-                        aux = "\t@ManyToMany(mappedBy=\"" + relacion.getNameB().toLowerCase() + "s\")\n"
+                        aux = "\t@ManyToMany(mappedBy=\"" + relacion.getNameB().toLowerCase() + "s\"";
+                        if(relacion.isCascade()){
+                            aux += ", cascade = CascadeType.REMOVE";
+                        }
+                        aux +=  ")\n"
                                 + "\tprivate Set<" + relacion.getNameA() + "> " + relacion.getNameA().toLowerCase() + "s;\n\n";
 
                         aux += "\tpublic void add" + relacion.getNameA() + "s(" + relacion.getNameA() + " " + relacion.getNameA().toLowerCase() + "){\n" +
@@ -325,14 +329,26 @@ public class GeneradorService {
                     }else {
                         if(relacion.getCardinalityA().equals("0..1")) {
                             if(relacion.getCardinalityB().equals("0..1")) { //One to one
-                                aux = "\t@OneToOne(mappedBy=\"" + relacion.getNameB().toLowerCase() + "\")\n\tprivate "
+                                aux = "\t@OneToOne(mappedBy=\"" + relacion.getNameB().toLowerCase() + "\"";
+                                if(relacion.isCascade()){
+                                    aux += ", cascade = CascadeType.REMOVE";
+                                }
+                                aux += ")\n\tprivate "
                                         + relacion.getNameA() + " " + relacion.getNameA().toLowerCase() + ";\n\n";
                             }else {	//Many to one
-                                aux = "\t@ManyToOne(mappedBy=\"" + relacion.getNameB().toLowerCase() + "s\")\n\tprivate "
+                                aux = "\t@ManyToOne(mappedBy=\"" + relacion.getNameB().toLowerCase() + "s\"";
+                                if(relacion.isCascade()){
+                                    aux += ", cascade = CascadeType.REMOVE";
+                                }
+                                aux += ")\n\tprivate "
                                         + relacion.getNameA() + " " + relacion.getNameA().toLowerCase() + ";\n\n";
                             }
                         }else if(relacion.getCardinalityB().equals("0..1")) { //One to many
-                            aux = "\t@OneToMany(mappedBy=\"" + relacion.getNameB().toLowerCase() + "\")\n\tprivate Set<"
+                            aux = "\t@OneToMany(mappedBy=\"" + relacion.getNameB().toLowerCase() + "\"";
+                            if(relacion.isCascade()){
+                                aux += ", cascade = CascadeType.REMOVE";
+                            }
+                            aux += ")\n\tprivate Set<"
                                     + relacion.getNameA() + "> " + relacion.getNameA().toLowerCase() + "s;\n\n";
 
                             aux += "\tpublic boolean add" + relacion.getNameA() + "(" + relacion.getNameA() + " " + relacion.getNameA().toLowerCase() + "){\n" +
@@ -2984,7 +3000,7 @@ public class GeneradorService {
      * Eso incluye los index, layout, error html's etc.
      * @throws IndexException Excepción
      */
-    private void generateIndexDocs(String title, List<EntidadDto> entidades, List<Idioma> idiomas, ColorPicker colores, boolean nav) throws IndexException {
+    private void generateIndexDocs(String title, List<EntidadDto> entidades, List<Idioma> idiomas, ColorPick colores, boolean nav) throws IndexException {
 
         File f = null;
         FileWriter writer = null;
@@ -3145,15 +3161,19 @@ public class GeneradorService {
             }
 
             writer.append("\t\t\t\t</ul>\n" +
-                    "\n" +
                     "\t\t\t</div>\n" +
                     "\n" +
+                    "\t\t\t<div sec:authorize=\"isAuthenticated()\" class=\"nav-item ms-3 mx-3\">\n" +
+                    "\t\t\t\t<a class=\"nav-link\" th:href=\"@{/logout}\"><strong th:text=\"#{principal.logout}\"></strong></a>\n" +
+                    "\t\t\t</div>\n" +
+                    "\t\t\t<div sec:authorize=\"isAnonymous()\" class=\"nav-item ms-3 mx-3\">\n" +
+                    "\t\t\t\t<a class=\"nav-link\" th:href=\"@{/login}\"><strong th:text=\"#{principal.login}\"></strong></a>\n" +
+                    "\t\t\t</div>\n" +
                     "\t\t\t<div class=\"nav-item dropdown me-4\">\n" +
-                    "\n" +
                     "\t\t\t\t<a class=\"nav-link dropdown-toggle\" href=\"#\" role=\"button\" data-bs-toggle=\"dropdown\"><img th:src=\"@{/images/acceso.png}\" alt=\"\" height=\"30\"></a>\n" +
-                    "\n" +
                     "\t\t\t\t<ul class=\"dropdown-menu text-center\" style=\"background-color: " + colores.getPrincipalCodeColor() + ";\">\n" +
-                    "\t\t\t\t\t<li><a class=\"dropdown-item\" th:href=\"@{/loginlogout}\"><strong th:text=\"#{principal.loginlogout}\"></strong></a></li>\n" +
+                    "\t\t\t\t\t<li><span sec:authorize=\"isAuthenticated()\" class=\"dropdown-item fw-bold\" sec:authentication=\"name\"></span></li>\n" +
+                    "\t\t\t\t\t<li><a sec:authorize=\"isAnonymous()\" class=\"dropdown-item\" th:href=\"@{/login}\"><strong th:text=\"#{principal.login}\"></strong></a></li>" +
                     "\t\t\t\t</ul>\n" +
                     "\n" +
                     "\t\t\t</div>" +
@@ -3255,17 +3275,21 @@ public class GeneradorService {
                     "\t\t\t</li>\n" +
                     "\t\t</ul>\n" +
                     "\n" +
+                    "\t\t<div sec:authorize=\"isAuthenticated()\" class=\"nav-item ms-3 mx-3\">\n" +
+                    "\t\t\t<a class=\"nav-link\" th:href=\"@{/logout}\"><strong th:text=\"#{principal.logout}\"></strong></a>\n" +
+                    "\t\t</div>\n" +
+                    "\t\t<div sec:authorize=\"isAnonymous()\" class=\"nav-item ms-3 mx-3\">\n" +
+                    "\t\t\t<a class=\"nav-link\" th:href=\"@{/login}\"><strong th:text=\"#{principal.login}\"></strong></a>\n" +
+                    "\t\t</div>\n\n" +
                     "\t\t<hr>\n" +
                     "\n" +
                     "\t\t<div class=\"nav-item dropdown me-4\">\n" +
-                    "\n" +
                     "\t\t\t<a class=\"nav-link dropdown-toggle\" href=\"#\" role=\"button\" data-bs-toggle=\"dropdown\"><img th:src=\"@{/images/acceso.png}\" alt=\"\" height=\"30\"></a>\n" +
-                    "\n" +
                     "\t\t\t<ul class=\"dropdown-menu text-center\" style=\"background-color: " + colores.getPrincipalCodeColor() + ";\">\n" +
-                    "\t\t\t\t<li><a class=\"dropdown-item\" th:href=\"@{/loginlogout}\"><strong th:text=\"#{principal.loginlogout}\"></strong></a></li>\n" +
+                    "\t\t\t\t<li><span sec:authorize=\"isAuthenticated()\" class=\"dropdown-item fw-bold\" sec:authentication=\"name\"></span></li>\n" +
+                    "\t\t\t\t<li><a sec:authorize=\"isAnonymous()\" class=\"dropdown-item\" th:href=\"@{/login}\"><strong th:text=\"#{principal.login}\"></strong></a></li>\n" +
                     "\t\t\t</ul>\n" +
-                    "\n" +
-                    "\t\t</div>\n" +
+                    "\t\t</div>" +
                     "\n" +
                     "\t\t<hr>\n" +
                     "\n" +
@@ -3340,8 +3364,14 @@ public class GeneradorService {
                     "<body>\n" +
                     "\n" +
                     "    <div layout:fragment=\"header\" class=\"container-fluid\">\n" +
-                    "        <div class=\"p-sm-5 mb-4 rounded text-body-emphasis text-center shadow\" style=\"background-color: #edf0eb;\">\n" +
-                    "            <h1 class=\"display-1\" th:text=\"#{principal.title}\"></h1>\n" +
+                    "        <div class=\"p-sm-5 mb-4 rounded text-body-emphasis text-center shadow\" style=\"background-color: " + colores.getTertiaryCodeColor() + ";\">\n" +
+                    "            <h1 class=\"display-1");
+
+            if(!colores.isTextDark()){
+                writer.append(" text-light");
+            }
+
+            writer.append("\" th:text=\"#{principal.title}\"></h1>\n" +
                     "        </div>\n" +
                     "    </div>\n" +
                     "\n" +
@@ -3359,7 +3389,11 @@ public class GeneradorService {
                 for (RoleDto rol : rolesUnicos) {
                     writer.append("            <!-- class " + entidad.getNombre() + " - Role " + rol.getRoleName().toUpperCase() + " -->\n" +
                             "            <div sec:authorize=\"hasRole('" + rol.getRoleName().toUpperCase() + "')\" class=\"col-1 mt-5\"></div>\n" +
-                            "            <div sec:authorize=\"hasRole('" + rol.getRoleName().toUpperCase() + "')\" class=\"col-4 p-4 mt-5 border rounded text-center card\" style=\"background-color: #edf0eb;\">\n" +
+                            "            <div sec:authorize=\"hasRole('" + rol.getRoleName().toUpperCase() + "')\" class=\"col-4 p-4 mt-5 border rounded text-center card");
+                    if(!colores.isTextDark()){
+                        writer.append(" text-light");
+                    }
+                    writer.append("\" style=\"background-color: " + colores.getTertiaryCodeColor() + ";\">\n" +
                             "                <h3 class=\"display-4\">" + entidad.getNombre() + "</h3>\n" +
                             "                <a th:href=\"@{/" + entidad.getNombre() + "}\" class=\"stretched-link\"></a>\n" +
                             "            </div>\n" +
@@ -3476,7 +3510,6 @@ public class GeneradorService {
                     "principal.back = " + defaultLanguage.getBack() + "\n" +
                     "principal.login = " + defaultLanguage.getLogin() + "\n" +
                     "principal.logout = " + defaultLanguage.getLogout() + "\n" +
-                    "principal.loginlogout = " + defaultLanguage.getLogin() + "/" + defaultLanguage.getLogout() + "\n" +
                     "principal.registrarUsuario = " + defaultLanguage.getRegistrarUsuario() + "\n" +
                     "principal.language = " + defaultLanguage.getIdioma() + "\n\n");
 
@@ -3508,7 +3541,6 @@ public class GeneradorService {
                         "principal.back = " + idioma.getBack() + "\n" +
                         "principal.login = " + idioma.getLogin() + "\n" +
                         "principal.logout = " + idioma.getLogout() + "\n" +
-                        "principal.loginlogout = " + idioma.getLogin() + "/" + idioma.getLogout() + "\n" +
                         "principal.registrarUsuario = " + idioma.getRegistrarUsuario() + "\n" +
                         "principal.language = " + defaultLanguage.getIdioma() + "\n\n");
 
