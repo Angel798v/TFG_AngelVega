@@ -33,7 +33,7 @@ public class DesignController {
         urlService.setUrl("/Design");
 
         if(designService.getColores() == null){
-            designService.setColores(new ColorPick("#8ED8F1","#FFFFFF", "#FEF9C7",true));
+            designService.setColores(new ColorPick("#8ED8F1","#FFFFFF", "#FEF9C7",true, true));
             model.addAttribute("colores",designService.getColores());
         }else{
             model.addAttribute("colores",designService.getColores());
@@ -75,7 +75,7 @@ public class DesignController {
 
         designService.setColores(colorPick);
 
-        System.out.println(colorPick.isTextDark());
+        System.out.println(colorPick.isTextNavDark());
 
         return "redirect:/Design";
     }
@@ -87,16 +87,16 @@ public class DesignController {
 
         switch (paletteColorPick){
             case "primera":
-                colorPick = new ColorPick("#026670","#FEF9C7","#9FEDD7", true);
+                colorPick = new ColorPick("#026670","#FEF9C7","#9FEDD7", true, false);
                 break;
             case "segunda":
-                colorPick = new ColorPick("#1F2833","#C5C6C7","#66FCF1", true);
+                colorPick = new ColorPick("#1F2833","#C5C6C7","#66FCF1", true, false);
                 break;
             case "tercera":
-                colorPick = new ColorPick("#E98074","#EAE7DC","#D8C3A5", true);
+                colorPick = new ColorPick("#E98074","#EAE7DC","#D8C3A5", true, true);
                 break;
             case "cuarta":
-                colorPick = new ColorPick("#FAED26","#9D8D8F","#5A5560", false);
+                colorPick = new ColorPick("#FAED26","#9D8D8F","#5A5560", false, true);
                 break;
             default:
                 colorPick = designService.getColores();

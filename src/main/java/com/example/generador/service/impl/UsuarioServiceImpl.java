@@ -27,6 +27,9 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     public UsuarioAdminCredentials admin;
 
+    @Setter
+    public boolean flagAdminUser = false;
+
     private Set<AtributoDto> atributosUsuario = new HashSet<>();
 
     @Autowired
@@ -147,19 +150,17 @@ public class UsuarioServiceImpl implements UsuarioService {
      */
     public boolean addAtributosUsuario(AtributoDto atributo){
 
+        if(admin == null){
+            admin = new UsuarioAdminCredentials();
+        }
+
         for(AtributoDto atr : atributosUsuario){
             if(atr.getNombre().equals(atributo.getNombre())){
                 return false;
             }
         }
 
-        for(AtributoDto atr : admin.getAtributos()){
-            if(atr.getNombre().equals(atributo.getNombre())){
-                return false;
-            }
-        }
-
-        return atributosUsuario.add(atributo) && admin.getAtributos().add(atributo);
+        return atributosUsuario.add(atributo);
     }
 
     //Para el generador
@@ -192,6 +193,15 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     public void clearAtributosUsuario(){
         atributosUsuario.clear();
+    }
+
+    public boolean isFlagAdminUser(){
+
+        return flagAdminUser;
+    }
+
+    public void setFlagAdminUser(boolean adminUser){
+        this.flagAdminUser = adminUser;
     }
 
 

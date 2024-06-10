@@ -1,6 +1,7 @@
 package com.example.generador.util;
 
 import com.example.generador.dto.AtributoDto;
+import com.example.generador.service.UsuarioService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,5 +29,17 @@ public class UsuarioAdminCredentials {
     private Set<AtributoDto> atributos = new HashSet<AtributoDto>();
 
     private String[] valores = new String[]{};
+
+
+    public UsuarioAdminCredentials(Set<AtributoDto> atributos){
+        this.atributos = atributos;
+    }
+
+    public void clearAdmin(){
+        this.email = null;
+        this.username = null;
+        this.password = null;
+        this.valores = null;
+    }
 
 }

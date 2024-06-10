@@ -16,6 +16,7 @@ public class DesignService {
      * Booleano que indica true si el diseño va a disponer de nav, false en caso de que disponga de barra lateral.
      */
     @Getter
+    @Setter
     private boolean nav = true;
 
     /**

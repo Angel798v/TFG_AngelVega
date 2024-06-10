@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html th:lang="#{principal.lang}" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}" xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <meta th:charset="#{principal.charset}">
+    <title th:text="#{principal.title}"> </title>
+</head>
+<body>
+
+    <div layout:fragment="cabecera">
+        <h1 class="display-2 mt-2 mb-5" th:text="#{vistaFinal.h1}"></h1>
+    </div>
+
+    <div layout:fragment="contenido">
+
+        <div class="container py-4 text-center mb-5">
+            <span class=" fs-3" th:text="#{vistaFinal.span.1}"></span><span class="fs-3 fst-italic" th:text="' ' + #{vistaFinal.span.2}"></span>
+            <div class="mt-4 row">
+                <div class="col-12">
+                    <form th:action="@{/descargaProyecto}" method="POST">
+                        <button type="submit" class="btn btn-success w-75 display-3 fst-italic fs-3" style="height: 4rem" th:href="@{/descargaProyecto}" th:text="#{vistaFinal.span.2}"></button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <span class="fs-5" th:text="#{vistaFinal.p1}"></span><span><em class="fs-5" th:text="' ' + #{vistaFinal.back.button} + '. '"></em></span>
+        <span class="fs-5" th:text="#{vistaFinal.p2}"></span><span><em class="fs-5" th:text="' ' + #{vistaFinal.index.button} + '.'"></em></span>
+        <div class="row mt-5">
+            <div class="col-2"></div>
+            <div class="col-8">
+                <div class="row">
+                    <div class="col-4">
+                        <a role="button" class="btn btn-info w-100 fs-5 fst-italic align-content-center" style="height: 3.5rem" th:href="@{/eliminarProyectoGenerado}" th:text="#{vistaFinal.back.button}"></a>
+                    </div>
+                    <div class="col-4">
+                        <a role="button" class="btn btn-primary w-100 fs-6 fst-italic align-content-center" style="height: 3.5rem" th:href="@{/vistaFinalProyecto/instrucciones}" th:text="#{vistaFinal.instructions.button}"></a>
+                    </div>
+                    <div class="col-4">
+                        <a role="button" class="btn btn-warning w-100 fs-6 fst-italic align-content-center" style="height: 3.5rem" th:href="@{/index} + '?restart=true'" th:text="#{vistaFinal.index.button}"></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

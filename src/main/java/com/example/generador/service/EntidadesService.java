@@ -14,6 +14,7 @@ import java.util.Objects;
 public class EntidadesService {
 
     @Getter
+    @Setter
     public boolean vistaCompacta = false;
 
     @Autowired

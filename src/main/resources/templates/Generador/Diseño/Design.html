@@ -42,13 +42,22 @@
 					</div>
 				</div>
 
-				<div th:unless="${colores.textDark}" class="form-check form-switch mt-5">
+				<div th:unless="${colores.textDark}" class="form-check form-switch mt-5 ms-4">
 					<input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDisabled" disabled>
 					<label class="form-check-label" for="flexSwitchCheckDisabled" th:text="#{colorPicker.check}"></label>
 				</div>
-				<div th:if="${colores.textDark}" class="form-check form-switch mt-5">
+				<div th:if="${colores.textDark}" class="form-check form-switch mt-5 ms-4">
 					<input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckCheckedDisabled" checked disabled>
 					<label class="form-check-label" for="flexSwitchCheckCheckedDisabled" th:text="#{colorPicker.check}"></label>
+				</div>
+
+				<div th:unless="${colores.textNavDark}" class="form-check form-switch mt-5 ms-4">
+					<input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDisabled2" disabled>
+					<label class="form-check-label" for="flexSwitchCheckDisabled2" th:text="#{colorPicker.check.2}"></label>
+				</div>
+				<div th:if="${colores.textNavDark}" class="form-check form-switch mt-5 ms-4">
+					<input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckCheckedDisabled2" checked disabled>
+					<label class="form-check-label" for="flexSwitchCheckCheckedDisabled2" th:text="#{colorPicker.check.2}"></label>
 				</div>
 			</div>
 

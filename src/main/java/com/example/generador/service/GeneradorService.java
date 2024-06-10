@@ -150,7 +150,7 @@ public class GeneradorService {
             generateRoleDocs();
             generateIndexDocs(projectService.getAbbreviatedTitleProject(), entidadesService.getEntidades(), idiomaService.getIdiomas(), designService.getColores(), designService.isNav());
             generatePropertiesDocs(idiomaService.getIdiomas(),idiomaService.getIdiomaDefault(), projectService.getTitleProject(), projectService.getNameDB(),
-                    projectService.getNumPuerto());
+                    projectService.getNumPuerto(), projectService.getNumPuertoDB());
             generateOthers();
             copyImages();
         }catch (Exception exception){
@@ -246,6 +246,15 @@ public class GeneradorService {
                     }else {
                         aux += "unique = false)\n";
                     }
+
+                    if(atr.getTipo().equals("Date")){
+                        aux += "\t@Temporal(TemporalType.DATE)\n";
+                    }else if(atr.getTipo().equals("Time")){
+                        aux += "\t@Temporal(TemporalType.TIME)\n";
+                    }else if(atr.getTipo().equals("Timestamp")){
+                        aux += "\t@Temporal(TemporalType.TIMESTAMP)\n";
+                    }
+
                     aux += "\tprivate " + atr.getTipo() + " " + atr.getNombre().toLowerCase() + ";\n\n\n";
                     writer.append(aux);
                 }
@@ -457,7 +466,11 @@ public class GeneradorService {
 
             //Atributos
             for(AtributoDto atributo : entidad.getAtributos()) {
-                writer.append("\tprivate " + atributo.getTipo() + " " + atributo.getNombre() + ";\n\n");
+                if(atributo.getTipo().equals("Time") || atributo.getTipo().equals("Timestamp")){
+                    writer.append("\tprivate String " + atributo.getNombre() + ";\n\n");
+                }else {
+                    writer.append("\tprivate " + atributo.getTipo() + " " + atributo.getNombre() + ";\n\n");
+                }
             }
 
             //Relaciones
@@ -580,6 +593,10 @@ public class GeneradorService {
                 writer.append("import org.springframework.web.bind.annotation.*;\n");
                 writer.append("import org.springframework.security.core.Authentication;\n");
                 writer.append("import org.springframework.security.core.context.SecurityContextHolder;\n");
+                writer.append("import java.sql.Time;\n" +
+                        "import java.sql.Timestamp;\n" +
+                        "import java.time.LocalDateTime;\n" +
+                        "import java.time.LocalTime;\n");
                 writer.append("import java.util.*;\n");
                 writer.append("import " + this.pathCode + ".service.UrlService;\n");
                 writer.append("import " + this.pathCode + ".model." + entidad.getNombre() + ";\n");
@@ -690,10 +707,24 @@ public class GeneradorService {
                 String letraInicial, resto, nombreCompleto = null;
                 for (AtributoDto atr : entidad.getAtributos()) {
                     if (!atr.isPrimaryKey()) {
-                        letraInicial = atr.getNombre().substring(0, 1).toUpperCase();
-                        resto = atr.getNombre().substring(1);
-                        nombreCompleto = letraInicial + resto;
-                        writer.append("\t\t" + entidad.getNombre().toLowerCase() + ".set" + nombreCompleto + "(" + entidad.getNombre().toLowerCase() + "Dto.get" + nombreCompleto + "());\n");
+                        if(!atr.getTipo().equals("Time") && !atr.getTipo().equals("Timestamp")) {
+                            letraInicial = atr.getNombre().substring(0, 1).toUpperCase();
+                            resto = atr.getNombre().substring(1);
+                            nombreCompleto = letraInicial + resto;
+                            writer.append("\t\t" + entidad.getNombre().toLowerCase() + ".set" + nombreCompleto + "(" + entidad.getNombre().toLowerCase() + "Dto.get" + nombreCompleto + "());\n");
+                        }else{
+                            if(atr.getTipo().equals("Time")){
+                                letraInicial = atr.getNombre().substring(0, 1).toUpperCase();
+                                resto = atr.getNombre().substring(1);
+                                nombreCompleto = letraInicial + resto;
+                                writer.append("\t\t" + entidad.getNombre().toLowerCase() + ".set" + nombreCompleto + "(Time.valueOf(LocalTime.parse(" + entidad.getNombre().toLowerCase() + "Dto.get" + nombreCompleto + "())));\n");
+                            }else{
+                                letraInicial = atr.getNombre().substring(0, 1).toUpperCase();
+                                resto = atr.getNombre().substring(1);
+                                nombreCompleto = letraInicial + resto;
+                                writer.append("\t\t" + entidad.getNombre().toLowerCase() + ".set" + nombreCompleto + "(Timestamp.valueOf(LocalDateTime.parse(" + entidad.getNombre().toLowerCase() + "Dto.get" + nombreCompleto + "())));\n");
+                            }
+                        }
                     }
                 }
                 for (Relacion relacion : relaciones) {
@@ -730,10 +761,17 @@ public class GeneradorService {
                 writer.append("\t\t" + entidad.getNombre() + " " + entidad.getNombre().toLowerCase() + " = " + entidad.getNombre().toLowerCase() + "Repository.findById(id);\n");
                 writer.append("\t\t" + entidad.getNombre() + "Dto " + entidad.getNombre().toLowerCase() + "Dto = new " + entidad.getNombre() + "Dto();\n\n");
                 for (AtributoDto atr : entidad.getAtributos()) {
-                    letraInicial = atr.getNombre().substring(0, 1).toUpperCase();
-                    resto = atr.getNombre().substring(1);
-                    nombreCompleto = letraInicial + resto;
-                    writer.append("\t\t" + entidad.getNombre().toLowerCase() + "Dto.set" + nombreCompleto + "(" + entidad.getNombre().toLowerCase() + ".get" + nombreCompleto + "());\n");
+                    if(!atr.getTipo().equals("Time") && !atr.getTipo().equals("Timestamp")) {
+                        letraInicial = atr.getNombre().substring(0, 1).toUpperCase();
+                        resto = atr.getNombre().substring(1);
+                        nombreCompleto = letraInicial + resto;
+                        writer.append("\t\t" + entidad.getNombre().toLowerCase() + "Dto.set" + nombreCompleto + "(" + entidad.getNombre().toLowerCase() + ".get" + nombreCompleto + "());\n");
+                    }else{
+                        letraInicial = atr.getNombre().substring(0, 1).toUpperCase();
+                        resto = atr.getNombre().substring(1);
+                        nombreCompleto = letraInicial + resto;
+                        writer.append("\t\t" + entidad.getNombre().toLowerCase() + "Dto.set" + nombreCompleto + "(String.valueOf(" + entidad.getNombre().toLowerCase() + ".get" + nombreCompleto + "()));\n");
+                    }
                 }
 
                 writer.append("\n");
@@ -799,12 +837,28 @@ public class GeneradorService {
                 writer.append("\t\t" + entidad.getNombre() + " " + entidad.getNombre().toLowerCase() + " = " + entidad.getNombre().toLowerCase() + "Repository.findById(id);\n");
                 for (AtributoDto atr : entidad.getAtributos()) {
                     if (!atr.isPrimaryKey()) {
-                        letraInicial = atr.getNombre().substring(0, 1).toUpperCase();
-                        resto = atr.getNombre().substring(1);
-                        nombreCompleto = letraInicial + resto;
-                        writer.append("\t\t" + entidad.getNombre().toLowerCase() + ".set" + nombreCompleto + "(" + entidad.getNombre().toLowerCase() + "Dto.get" + nombreCompleto + "());\n");
+                        if(!atr.getTipo().equals("Time") && !atr.getTipo().equals("Timestamp")) {
+                            letraInicial = atr.getNombre().substring(0, 1).toUpperCase();
+                            resto = atr.getNombre().substring(1);
+                            nombreCompleto = letraInicial + resto;
+                            writer.append("\t\t" + entidad.getNombre().toLowerCase() + ".set" + nombreCompleto + "(" + entidad.getNombre().toLowerCase() + "Dto.get" + nombreCompleto + "());\n");
+                        }else{
+                            if(atr.getTipo().equals("Time")){
+                                letraInicial = atr.getNombre().substring(0, 1).toUpperCase();
+                                resto = atr.getNombre().substring(1);
+                                nombreCompleto = letraInicial + resto;
+                                writer.append("\t\t" + entidad.getNombre().toLowerCase() + ".set" + nombreCompleto + "(Time.valueOf(LocalTime.parse(" + entidad.getNombre().toLowerCase() + "Dto.get" + nombreCompleto + "())));\n");
+                            }else{
+                                letraInicial = atr.getNombre().substring(0, 1).toUpperCase();
+                                resto = atr.getNombre().substring(1);
+                                nombreCompleto = letraInicial + resto;
+                                writer.append("\t\t" + entidad.getNombre().toLowerCase() + ".set" + nombreCompleto + "(Timestamp.valueOf(LocalDateTime.parse(" + entidad.getNombre().toLowerCase() + "Dto.get" + nombreCompleto + "())));\n");
+                            }
+                        }
                     }
                 }
+
+
                 for (Relacion relacion : relaciones) {
                     if (relacion.getA() == entidad) {
                         if (relacion.getCardinalityA().equals("N")) {
@@ -859,6 +913,11 @@ public class GeneradorService {
                 writer.append("import org.springframework.web.bind.annotation.*;\n");
                 writer.append("import org.springframework.security.core.Authentication;\n");
                 writer.append("import org.springframework.security.core.context.SecurityContextHolder;\n");
+                writer.append("import java.util.*;\n");
+                writer.append("import java.sql.Time;\n" +
+                        "import java.sql.Timestamp;\n" +
+                        "import java.time.LocalDateTime;\n" +
+                        "import java.time.LocalTime;\n");
                 writer.append("import java.util.*;\n");
                 writer.append("import " + this.pathCode + ".service.UrlService;\n");
                 writer.append("import " + this.pathCode + ".model." + entidad.getNombre() + ";\n");
@@ -960,10 +1019,24 @@ public class GeneradorService {
                 String letraInicial, resto, nombreCompleto = null;
                 for (AtributoDto atr : entidad.getAtributos()) {
                     if (!atr.isPrimaryKey()) {
-                        letraInicial = atr.getNombre().substring(0, 1).toUpperCase();
-                        resto = atr.getNombre().substring(1);
-                        nombreCompleto = letraInicial + resto;
-                        writer.append("\t\t" + entidad.getNombre().toLowerCase() + ".set" + nombreCompleto + "(" + entidad.getNombre().toLowerCase() + "Dto.get" + nombreCompleto + "());\n");
+                        if(!atr.getTipo().equals("Time") && !atr.getTipo().equals("Timestamp")) {
+                            letraInicial = atr.getNombre().substring(0, 1).toUpperCase();
+                            resto = atr.getNombre().substring(1);
+                            nombreCompleto = letraInicial + resto;
+                            writer.append("\t\t" + entidad.getNombre().toLowerCase() + ".set" + nombreCompleto + "(" + entidad.getNombre().toLowerCase() + "Dto.get" + nombreCompleto + "());\n");
+                        }else{
+                            if(atr.getTipo().equals("Time")){
+                                letraInicial = atr.getNombre().substring(0, 1).toUpperCase();
+                                resto = atr.getNombre().substring(1);
+                                nombreCompleto = letraInicial + resto;
+                                writer.append("\t\t" + entidad.getNombre().toLowerCase() + ".set" + nombreCompleto + "(Time.valueOf(LocalTime.parse(" + entidad.getNombre().toLowerCase() + "Dto.get" + nombreCompleto + "())));\n");
+                            }else{
+                                letraInicial = atr.getNombre().substring(0, 1).toUpperCase();
+                                resto = atr.getNombre().substring(1);
+                                nombreCompleto = letraInicial + resto;
+                                writer.append("\t\t" + entidad.getNombre().toLowerCase() + ".set" + nombreCompleto + "(Timestamp.valueOf(LocalDateTime.parse(" + entidad.getNombre().toLowerCase() + "Dto.get" + nombreCompleto + "())));\n");
+                            }
+                        }
                     }
                 }
                 for (Relacion relacion : relaciones) {
@@ -993,10 +1066,17 @@ public class GeneradorService {
                 writer.append("\t\t" + entidad.getNombre() + " " + entidad.getNombre().toLowerCase() + " = " + entidad.getNombre().toLowerCase() + "Repository.findById(id);\n");
                 writer.append("\t\t" + entidad.getNombre() + "Dto " + entidad.getNombre().toLowerCase() + "Dto = new " + entidad.getNombre() + "Dto();\n\n");
                 for (AtributoDto atr : entidad.getAtributos()) {
-                    letraInicial = atr.getNombre().substring(0, 1).toUpperCase();
-                    resto = atr.getNombre().substring(1);
-                    nombreCompleto = letraInicial + resto;
-                    writer.append("\t\t" + entidad.getNombre().toLowerCase() + "Dto.set" + nombreCompleto + "(" + entidad.getNombre().toLowerCase() + ".get" + nombreCompleto + "());\n");
+                    if(!atr.getTipo().equals("Time") && !atr.getTipo().equals("Timestamp")) {
+                        letraInicial = atr.getNombre().substring(0, 1).toUpperCase();
+                        resto = atr.getNombre().substring(1);
+                        nombreCompleto = letraInicial + resto;
+                        writer.append("\t\t" + entidad.getNombre().toLowerCase() + "Dto.set" + nombreCompleto + "(" + entidad.getNombre().toLowerCase() + ".get" + nombreCompleto + "());\n");
+                    }else{
+                        letraInicial = atr.getNombre().substring(0, 1).toUpperCase();
+                        resto = atr.getNombre().substring(1);
+                        nombreCompleto = letraInicial + resto;
+                        writer.append("\t\t" + entidad.getNombre().toLowerCase() + "Dto.set" + nombreCompleto + "(String.valueOf(" + entidad.getNombre().toLowerCase() + ".get" + nombreCompleto + "()));\n");
+                    }
                 }
 
                 writer.append("\n");
@@ -1063,10 +1143,24 @@ public class GeneradorService {
                 writer.append("\t\t" + entidad.getNombre() + " " + entidad.getNombre().toLowerCase() + " = new " + entidad.getNombre() + "();\n");
                 for (AtributoDto atr : entidad.getAtributos()) {
                     if (!atr.isPrimaryKey()) {
-                        letraInicial = atr.getNombre().substring(0, 1).toUpperCase();
-                        resto = atr.getNombre().substring(1);
-                        nombreCompleto = letraInicial + resto;
-                        writer.append("\t\t" + entidad.getNombre().toLowerCase() + ".set" + nombreCompleto + "(" + entidad.getNombre().toLowerCase() + "Dto.get" + nombreCompleto + "());\n");
+                        if(!atr.getTipo().equals("Time") && !atr.getTipo().equals("Timestamp")) {
+                            letraInicial = atr.getNombre().substring(0, 1).toUpperCase();
+                            resto = atr.getNombre().substring(1);
+                            nombreCompleto = letraInicial + resto;
+                            writer.append("\t\t" + entidad.getNombre().toLowerCase() + ".set" + nombreCompleto + "(" + entidad.getNombre().toLowerCase() + "Dto.get" + nombreCompleto + "());\n");
+                        }else{
+                            if(atr.getTipo().equals("Time")){
+                                letraInicial = atr.getNombre().substring(0, 1).toUpperCase();
+                                resto = atr.getNombre().substring(1);
+                                nombreCompleto = letraInicial + resto;
+                                writer.append("\t\t" + entidad.getNombre().toLowerCase() + ".set" + nombreCompleto + "(Time.valueOf(LocalTime.parse(" + entidad.getNombre().toLowerCase() + "Dto.get" + nombreCompleto + "())));\n");
+                            }else{
+                                letraInicial = atr.getNombre().substring(0, 1).toUpperCase();
+                                resto = atr.getNombre().substring(1);
+                                nombreCompleto = letraInicial + resto;
+                                writer.append("\t\t" + entidad.getNombre().toLowerCase() + ".set" + nombreCompleto + "(Timestamp.valueOf(LocalDateTime.parse(" + entidad.getNombre().toLowerCase() + "Dto.get" + nombreCompleto + "())));\n");
+                            }
+                        }
                     }
                 }
                 for (Relacion relacion : relaciones) {
@@ -1331,9 +1425,38 @@ public class GeneradorService {
                 writer.append("\t\t\t<form th:action=\"@{/" + entidad.getNombre() + "/Post}\" method=\"POST\" th:object=\"${object}\">\n\n");
                 for (AtributoDto atr : entidad.getAtributos()) {
                     if (!atr.isPrimaryKey()) {
-                        writer.append("\t\t\t\t<div class=\"input-group mt-5\">\n");
-                        writer.append("\t\t\t\t\t<label for=\"" + atr.getNombre() + "\" class=\"control-label input-group-text\" th:text=\"'" + atr.getNombre() + "'\"></label>\n");
-                        writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" required th:field=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                        switch (atr.getTipo()){
+                            case "String":
+                                writer.append("\t\t\t\t<div class=\"input-group mt-5\">\n");
+                                writer.append("\t\t\t\t\t<label for=\"" + atr.getNombre() + "\" class=\"control-label input-group-text\" th:text=\"'" + atr.getNombre() + "'\"></label>\n");
+                                writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"text\" required th:field=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                break;
+
+                            case "int", "float":
+                                writer.append("\t\t\t\t<div class=\"input-group mt-5\">\n");
+                                writer.append("\t\t\t\t\t<label for=\"" + atr.getNombre() + "\" class=\"control-label input-group-text\" th:text=\"'" + atr.getNombre() + "'\"></label>\n");
+                                writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"number\" required th:field=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                break;
+
+                            case "Date":
+                                writer.append("\t\t\t\t<div class=\"input-group mt-5\">\n");
+                                writer.append("\t\t\t\t\t<label for=\"" + atr.getNombre() + "\" class=\"control-label input-group-text\" th:text=\"'" + atr.getNombre() + "'\"></label>\n");
+                                writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"date\" required th:field=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                break;
+
+                            case "Time":
+                                writer.append("\t\t\t\t<div class=\"input-group mt-5\">\n");
+                                writer.append("\t\t\t\t\t<label for=\"" + atr.getNombre() + "\" class=\"control-label input-group-text\" th:text=\"'" + atr.getNombre() + "'\"></label>\n");
+                                writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"time\" required th:field=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                break;
+
+                            case "Timestamp":
+                                writer.append("\t\t\t\t<div class=\"input-group mt-5\">\n");
+                                writer.append("\t\t\t\t\t<label for=\"" + atr.getNombre() + "\" class=\"control-label input-group-text\" th:text=\"'" + atr.getNombre() + "'\"></label>\n");
+                                writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"datetime-local\" required th:field=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                break;
+                        }
+
                     }
                 }
                 int i = 1;
@@ -1446,9 +1569,48 @@ public class GeneradorService {
                 writer.append("\t\t\t<form th:action=\"@{/" + entidad.getNombre() + "/Put/} + ${object.id_" + entidad.getNombre().toLowerCase() + "}\" method=\"POST\" th:object=\"${object}\">\n\n");
                 for (AtributoDto atr : entidad.getAtributos()) {
                     if (!atr.isPrimaryKey()) {
-                        writer.append("\t\t\t\t<div class=\"input-group mt-5\">\n");
-                        writer.append("\t\t\t\t\t<label for=\"" + atr.getNombre() + "\" class=\"control-label input-group-text\" th:text=\"'" + atr.getNombre() + "'\"></label>\n");
-                        writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" required th:field=\"*{" + atr.getNombre() + "}\" th:value=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                        switch (atr.getTipo()){
+                            case "String":
+                                writer.append("\t\t\t\t<div class=\"input-group mt-5\">\n");
+                                writer.append("\t\t\t\t\t<label for=\"" + atr.getNombre() + "\" class=\"control-label input-group-text\" th:text=\"'" + atr.getNombre() + "'\"></label>\n");
+                                writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"text\" required th:field=\"*{" + atr.getNombre() + "}\" th:value=\\\"*{\" + atr.getNombre() + \"}\\\">\n\t\t\t\t</div>\n\n");
+                                break;
+
+                            case "int":
+                                writer.append("\t\t\t\t<div class=\"input-group mt-5\">\n");
+                                writer.append("\t\t\t\t\t<label for=\"" + atr.getNombre() + "\" class=\"control-label input-group-text\" th:text=\"'" + atr.getNombre() + "'\"></label>\n");
+                                writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"number\" required th:field=\"*{" + atr.getNombre() + "}\" th:value=\\\"*{\" + atr.getNombre() + \"}\\\">\n\t\t\t\t</div>\n\n");
+                                break;
+
+                            case "float":
+                                writer.append("\t\t\t\t<div class=\"input-group mt-5\">\n");
+                                writer.append("\t\t\t\t\t<label for=\"" + atr.getNombre() + "\" class=\"control-label input-group-text\" th:text=\"'" + atr.getNombre() + "'\"></label>\n");
+                                writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"number\" required th:field=\"*{" + atr.getNombre() + "}\" th:value=\\\"*{\" + atr.getNombre() + \"}\\\">\n\t\t\t\t</div>\n\n");
+                                break;
+
+                            case "Date":
+                                writer.append("\t\t\t\t<div class=\"input-group mt-5\">\n");
+                                writer.append("\t\t\t\t\t<label for=\"" + atr.getNombre() + "\" class=\"control-label input-group-text\" th:text=\"'" + atr.getNombre() + "'\"></label>\n");
+                                writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"date\" required th:field=\"*{" + atr.getNombre() + "}\" th:value=\\\"*{\" + atr.getNombre() + \"}\\\">\n\t\t\t\t</div>\n\n");
+                                break;
+
+                            case "Time":
+                                writer.append("\t\t\t\t<div class=\"input-group mt-5\">\n");
+                                writer.append("\t\t\t\t\t<label for=\"" + atr.getNombre() + "\" class=\"control-label input-group-text\" th:text=\"'" + atr.getNombre() + "'\"></label>\n");
+                                writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"time\" required th:field=\"*{" + atr.getNombre() + "}\" th:value=\\\"*{\" + atr.getNombre() + \"}\\\">\n\t\t\t\t</div>\n\n");
+                                break;
+
+                            case "Timestamp":
+                                writer.append("\t\t\t\t<div class=\"input-group mt-5\">\n");
+                                writer.append("\t\t\t\t\t<label for=\"" + atr.getNombre() + "\" class=\"control-label input-group-text\" th:text=\"'" + atr.getNombre() + "'\"></label>\n");
+                                writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"datetime-local\" required th:field=\"*{" + atr.getNombre() + "}\" th:value=\\\"*{\" + atr.getNombre() + \"}\\\">\n\t\t\t\t</div>\n\n");
+                                break;
+
+                            default:
+                                writer.append("\t\t\t\t<div class=\"input-group mt-5\">\n");
+                                writer.append("\t\t\t\t\t<label for=\"" + atr.getNombre() + "\" class=\"control-label input-group-text\" th:text=\"'" + atr.getNombre() + "'\"></label>\n");
+                                writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"text\" required th:field=\"*{" + atr.getNombre() + "}\" th:value=\\\"*{\" + atr.getNombre() + \"}\\\">\n\t\t\t\t</div>\n\n");
+                        }
                     } else {
                         writer.append("\t\t\t\t<div class=\"input-group mt-5\">\n");
                         writer.append("\t\t\t\t\t<label for=\"" + atr.getNombre() + "\" class=\"control-label input-group-text\" th:text=\"'" + atr.getNombre() + "'\"></label>\n");
@@ -1653,9 +1815,48 @@ public class GeneradorService {
                 writer.append("\t\t\t<form th:action=\"@{/" + entidad.getNombre() + "/Post}\" method=\"POST\" th:object=\"${object}\">\n\n");
                 for (AtributoDto atr : entidad.getAtributos()) {
                     if (!atr.isPrimaryKey()) {
-                        writer.append("\t\t\t\t<div class=\"input-group mt-5\">\n");
-                        writer.append("\t\t\t\t\t<label for=\"" + atr.getNombre() + "\" class=\"control-label input-group-text\" th:text=\"'" + atr.getNombre() + "'\"></label>\n");
-                        writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" required th:field=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                        switch (atr.getTipo()){
+                            case "String":
+                                writer.append("\t\t\t\t<div class=\"input-group mt-5\">\n");
+                                writer.append("\t\t\t\t\t<label for=\"" + atr.getNombre() + "\" class=\"control-label input-group-text\" th:text=\"'" + atr.getNombre() + "'\"></label>\n");
+                                writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"text\" required th:field=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                break;
+
+                            case "int":
+                                writer.append("\t\t\t\t<div class=\"input-group mt-5\">\n");
+                                writer.append("\t\t\t\t\t<label for=\"" + atr.getNombre() + "\" class=\"control-label input-group-text\" th:text=\"'" + atr.getNombre() + "'\"></label>\n");
+                                writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"number\" required th:field=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                break;
+
+                            case "float":
+                                writer.append("\t\t\t\t<div class=\"input-group mt-5\">\n");
+                                writer.append("\t\t\t\t\t<label for=\"" + atr.getNombre() + "\" class=\"control-label input-group-text\" th:text=\"'" + atr.getNombre() + "'\"></label>\n");
+                                writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"number\" required th:field=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                break;
+
+                            case "Date":
+                                writer.append("\t\t\t\t<div class=\"input-group mt-5\">\n");
+                                writer.append("\t\t\t\t\t<label for=\"" + atr.getNombre() + "\" class=\"control-label input-group-text\" th:text=\"'" + atr.getNombre() + "'\"></label>\n");
+                                writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"date\" required th:field=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                break;
+
+                            case "Time":
+                                writer.append("\t\t\t\t<div class=\"input-group mt-5\">\n");
+                                writer.append("\t\t\t\t\t<label for=\"" + atr.getNombre() + "\" class=\"control-label input-group-text\" th:text=\"'" + atr.getNombre() + "'\"></label>\n");
+                                writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"time\" required th:field=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                break;
+
+                            case "Timestamp":
+                                writer.append("\t\t\t\t<div class=\"input-group mt-5\">\n");
+                                writer.append("\t\t\t\t\t<label for=\"" + atr.getNombre() + "\" class=\"control-label input-group-text\" th:text=\"'" + atr.getNombre() + "'\"></label>\n");
+                                writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"datetime-local\" required th:field=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                break;
+
+                            default:
+                                writer.append("\t\t\t\t<div class=\"input-group mt-5\">\n");
+                                writer.append("\t\t\t\t\t<label for=\"" + atr.getNombre() + "\" class=\"control-label input-group-text\" th:text=\"'" + atr.getNombre() + "'\"></label>\n");
+                                writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"text\" required th:field=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                        }
                     }
                 }
                 int i = 1;
@@ -1708,9 +1909,48 @@ public class GeneradorService {
                 writer.append("\t\t\t<form th:action=\"@{/" + entidad.getNombre() + "/Put/} + ${object.id_" + entidad.getNombre().toLowerCase() + "}\" method=\"POST\" th:object=\"${object}\">\n\n");
                 for (AtributoDto atr : entidad.getAtributos()) {
                     if (!atr.isPrimaryKey()) {
-                        writer.append("\t\t\t\t<div class=\"input-group mt-5\">\n");
-                        writer.append("\t\t\t\t\t<label for=\"" + atr.getNombre() + "\" class=\"control-label input-group-text\" th:text=\"'" + atr.getNombre() + "'\"></label>\n");
-                        writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" required th:field=\"*{" + atr.getNombre() + "}\" th:value=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                        switch (atr.getTipo()){
+                            case "String":
+                                writer.append("\t\t\t\t<div class=\"input-group mt-5\">\n");
+                                writer.append("\t\t\t\t\t<label for=\"" + atr.getNombre() + "\" class=\"control-label input-group-text\" th:text=\"'" + atr.getNombre() + "'\"></label>\n");
+                                writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"text\" required th:field=\"*{" + atr.getNombre() + "}\" th:value=\\\"*{\" + atr.getNombre() + \"}\\\">\n\t\t\t\t</div>\n\n");
+                                break;
+
+                            case "int":
+                                writer.append("\t\t\t\t<div class=\"input-group mt-5\">\n");
+                                writer.append("\t\t\t\t\t<label for=\"" + atr.getNombre() + "\" class=\"control-label input-group-text\" th:text=\"'" + atr.getNombre() + "'\"></label>\n");
+                                writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"number\" required th:field=\"*{" + atr.getNombre() + "}\" th:value=\\\"*{\" + atr.getNombre() + \"}\\\">\n\t\t\t\t</div>\n\n");
+                                break;
+
+                            case "float":
+                                writer.append("\t\t\t\t<div class=\"input-group mt-5\">\n");
+                                writer.append("\t\t\t\t\t<label for=\"" + atr.getNombre() + "\" class=\"control-label input-group-text\" th:text=\"'" + atr.getNombre() + "'\"></label>\n");
+                                writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"number\" required th:field=\"*{" + atr.getNombre() + "}\" th:value=\\\"*{\" + atr.getNombre() + \"}\\\">\n\t\t\t\t</div>\n\n");
+                                break;
+
+                            case "Date":
+                                writer.append("\t\t\t\t<div class=\"input-group mt-5\">\n");
+                                writer.append("\t\t\t\t\t<label for=\"" + atr.getNombre() + "\" class=\"control-label input-group-text\" th:text=\"'" + atr.getNombre() + "'\"></label>\n");
+                                writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"date\" required th:field=\"*{" + atr.getNombre() + "}\" th:value=\\\"*{\" + atr.getNombre() + \"}\\\">\n\t\t\t\t</div>\n\n");
+                                break;
+
+                            case "Time":
+                                writer.append("\t\t\t\t<div class=\"input-group mt-5\">\n");
+                                writer.append("\t\t\t\t\t<label for=\"" + atr.getNombre() + "\" class=\"control-label input-group-text\" th:text=\"'" + atr.getNombre() + "'\"></label>\n");
+                                writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"time\" required th:field=\"*{" + atr.getNombre() + "}\" th:value=\\\"*{\" + atr.getNombre() + \"}\\\">\n\t\t\t\t</div>\n\n");
+                                break;
+
+                            case "Timestamp":
+                                writer.append("\t\t\t\t<div class=\"input-group mt-5\">\n");
+                                writer.append("\t\t\t\t\t<label for=\"" + atr.getNombre() + "\" class=\"control-label input-group-text\" th:text=\"'" + atr.getNombre() + "'\"></label>\n");
+                                writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"datetime-local\" required th:field=\"*{" + atr.getNombre() + "}\" th:value=\\\"*{\" + atr.getNombre() + \"}\\\">\n\t\t\t\t</div>\n\n");
+                                break;
+
+                            default:
+                                writer.append("\t\t\t\t<div class=\"input-group mt-5\">\n");
+                                writer.append("\t\t\t\t\t<label for=\"" + atr.getNombre() + "\" class=\"control-label input-group-text\" th:text=\"'" + atr.getNombre() + "'\"></label>\n");
+                                writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"text\" required th:field=\"*{" + atr.getNombre() + "}\" th:value=\\\"*{\" + atr.getNombre() + \"}\\\">\n\t\t\t\t</div>\n\n");
+                        }
                     } else {
                         writer.append("\t\t\t\t<div class=\"input-group mt-5\">\n");
                         writer.append("\t\t\t\t\t<label for=\"" + atr.getNombre() + "\" class=\"control-label input-group-text\" th:text=\"'" + atr.getNombre() + "'\"></label>\n");
@@ -2174,7 +2414,7 @@ public class GeneradorService {
             writer.append("\tpublic User(String username, String password, String email,");
 
             for(AtributoDto atr : usuarioService.getAtributosUsuario()){
-                    writer.append(" " + atr.getTipo() + " " + atr.getNombre() + ",");
+                    writer.append(" " + atr.getTipo() + " " + atr.getNombre().toLowerCase() + ",");
             }
 
             writer.append(" Role role) {\n" +
@@ -2183,7 +2423,7 @@ public class GeneradorService {
                     "\t\tthis.email = email;\n");
 
             for(AtributoDto atr : usuarioService.getAtributosUsuario()){
-                writer.append("\t\tthis." + atr.getNombre() + " = " + atr.getNombre() + ";\n");
+                writer.append("\t\tthis." + atr.getNombre().toLowerCase() + " = " + atr.getNombre().toLowerCase() + ";\n");
             }
 
             writer.append("\t\tthis.role = role;\n\t}\n\n");
@@ -2421,7 +2661,7 @@ public class GeneradorService {
                     "\t\t\t\"" + adminUser.getEmail() + "\",\n");
 
             int i = 0;
-            for(AtributoDto value : adminUser.getAtributos()){
+            for(AtributoDto value : usuarioService.getAtributosUsuario()){
                 if(value.getTipo().equals("int")){
                     writer.append("\t\t\t" + adminUser.getValores()[i] + ",\n");
                 }else {
@@ -3045,12 +3285,12 @@ public class GeneradorService {
             writer.append("\t@GetMapping(\"/loginlogout\")\n" +
                     "\tpublic String loginlogout(){\n\n" +
                     "\t\tAuthentication auth = SecurityContextHolder.getContext().getAuthentication();\n" +
-                    "\t\t\tif(auth.getPrincipal() == \"anonymousUser\"){\n" +
-                    "\t\t\t\treturn \"redirect:/login\";\n" +
-                    "\t\t\t}else{\n" +
-                    "\t\t\t\treturn \"redirect:/logout\";\n" +
-                    "\t\t\t}\n" +
-                    "\t\t}\n\n}");
+                    "\t\tif(auth.getPrincipal() == \"anonymousUser\"){\n" +
+                    "\t\t\treturn \"redirect:/login\";\n" +
+                    "\t\t}else{\n" +
+                    "\t\t\treturn \"redirect:/logout\";\n" +
+                    "\t\t}\n" +
+                    "\t}\n\n}");
 
             writer.close();
 
@@ -3082,9 +3322,15 @@ public class GeneradorService {
                     "\n" +
                     "\t\t<div class=\"container\" style=\"height:3rem\">\n" +
                     "\n" +
-                    "\t\t\t<a class=\"navbar-brand text-light\" th:href=\"@{/index}\"><img th:src=\"@{/images/home.png}\" alt=\"\" height=\"30\"></a>\n" +
+                    "\t\t\t<a class=\"navbar-brand\" th:href=\"@{/index}\"><img th:src=\"@{/images/home.png}\" alt=\"\" height=\"30\"></a>\n" +
                     "\n" +
-                    "\t\t\t<a class=\"navbar-brand\" th:href=\"@{/index}\">" + title + "</a>\n" +
+                    "\t\t\t<a class=\"navbar-brand");
+
+            if(!colores.isTextNavDark()){
+                writer.append(" text-light");
+            }
+
+            writer.append("\" th:href=\"@{/index}\">" + title + "</a>\n" +
                     "\n" +
                     "\t\t\t<button class=\"navbar-toggler\" type=\"button\" data-bs-toggle=\"collapse\" data-bs-target=\"#navbar\" aria-controls=\"navbarScroll\" aria-expanded=\"false\" aria-label=\"Toggle navigation\">\n" +
                     "\t\t\t\t<span class=\"navbar-toggler-icon\"></span>\n" +
@@ -3094,11 +3340,23 @@ public class GeneradorService {
                     "\n" +
                     "\t\t\t\t<ul class=\"navbar-nav\" style=\"--bs-scroll-height: 100px;\" >\n" +
                     "\t\t\t\t\t<li class=\"nav-item\">\n" +
-                    "\t\t\t\t\t\t<a class=\"nav-link\" th:href=\"@{/index}\"><strong th:text=\"#{principal.home}\"></strong></a>\n" +
+                    "\t\t\t\t\t\t<a class=\"nav-link");
+
+            if(!colores.isTextNavDark()){
+                writer.append(" text-light");
+            }
+
+            writer.append("\" th:href=\"@{/index}\"><strong th:text=\"#{principal.home}\"></strong></a>\n" +
                     "\t\t\t\t\t</li>\n" +
                     "\n" +
                     "\t\t\t\t\t<li class=\"nav-item dropdown ms-3\">\n" +
-                    "\t\t\t\t\t\t<a class=\"nav-link dropdown-toggle\" href=\"#\" role=\"button\" data-bs-toggle=\"dropdown\" aria-expanded=\"false\"><strong th:text=\"#{principal.services}\"></strong></a>\n" +
+                    "\t\t\t\t\t\t<a class=\"nav-link dropdown-toggle");
+
+            if(!colores.isTextNavDark()){
+                writer.append(" text-light");
+            }
+
+            writer.append("\" href=\"#\" role=\"button\" data-bs-toggle=\"dropdown\" aria-expanded=\"false\"><strong th:text=\"#{principal.services}\"></strong></a>\n" +
                     "\n" +
                     "\t\t\t\t\t\t<ul class=\"dropdown-menu\" style=\"background-color: " + colores.getPrincipalCodeColor() + ";\">\n");
 
@@ -3114,13 +3372,21 @@ public class GeneradorService {
 
                 if(primeraVez){
                     for (RoleDto rol : rolesUnicos) {
-                        writer.append("\t\t\t\t\t\t\t<li sec:authorize=\"hasRole('" + rol.getRoleName().toUpperCase() + "')\"><a class=\"dropdown-item\" th:href=\"@{/" + entidad.getNombre() + "}\"><strong>" + entidad.getNombre() + "</strong></a></li>\n");
+                        writer.append("\t\t\t\t\t\t\t<li sec:authorize=\"hasRole('" + rol.getRoleName().toUpperCase() + "')\"><a class=\"dropdown-item");
+                        if(!colores.isTextNavDark()){
+                            writer.append(" text-light");
+                        }
+                        writer.append("\" th:href=\"@{/" + entidad.getNombre() + "}\"><strong>" + entidad.getNombre() + "</strong></a></li>\n");
                     }
                     primeraVez = false;
                 }else{
                     writer.append("\t\t\t\t\t\t\t<li><hr class=\"dropdown-divider\"></li>\n");
                     for (RoleDto rol : rolesUnicos) {
-                        writer.append("\t\t\t\t\t\t\t<li sec:authorize=\"hasRole('" + rol.getRoleName().toUpperCase() + "')\"><a class=\"dropdown-item\" th:href=\"@{/" + entidad.getNombre() + "}\"><strong>" + entidad.getNombre() + "</strong></a></li>\n");
+                        writer.append("\t\t\t\t\t\t\t<li sec:authorize=\"hasRole('" + rol.getRoleName().toUpperCase() + "')\"><a class=\"dropdown-item");
+                        if(!colores.isTextNavDark()){
+                            writer.append(" text-light");
+                        }
+                        writer.append("\" th:href=\"@{/" + entidad.getNombre() + "}\"><strong>" + entidad.getNombre() + "</strong></a></li>\n");
                     }
                 }
 
@@ -3129,14 +3395,26 @@ public class GeneradorService {
             writer.append("\t\t\t\t\t\t</ul>\n" +
                     "\t\t\t\t\t</li>\n" +
                     "\t\t\t\t\t<li sec:authorize=\"hasRole('ADMIN')\" class=\"nav-item ms-3\">\n" +
-                    "\t\t\t\t\t\t<a class=\"nav-link\" th:href=\"@{/usuarios}\"><strong th:text=\"#{principal.usuarios}\"></strong></a>\n" +
+                    "\t\t\t\t\t\t<a class=\"nav-link");
+
+            if(!colores.isTextNavDark()){
+                writer.append(" text-light");
+            }
+
+            writer.append("\" th:href=\"@{/usuarios}\"><strong th:text=\"#{principal.usuarios}\"></strong></a>\n" +
                     "\t\t\t\t\t</li>\n" +
                     "\t\t\t\t</ul>\n" +
                     "\t\t\t</div>\n" +
                     "\n" +
                     "\t\t\t<div class=\"nav-item dropdown me-4\">\n" +
                     "\n" +
-                    "\t\t\t\t<a class=\"nav-link dropdown-toggle\" href=\"#\" role=\"button\" data-bs-toggle=\"dropdown\" aria-expanded=\"false\"><strong th:text=\"#{principal.language}\"></strong></a>\n" +
+                    "\t\t\t\t<a class=\"nav-link dropdown-toggle");
+
+            if(!colores.isTextNavDark()){
+                writer.append(" text-light");
+            }
+
+            writer.append("\" href=\"#\" role=\"button\" data-bs-toggle=\"dropdown\" aria-expanded=\"false\"><strong th:text=\"#{principal.language}\"></strong></a>\n" +
                     "\n" +
                     "\t\t\t\t<ul class=\"dropdown-menu text-center\" style=\"background-color: " + colores.getPrincipalCodeColor() + ";\">\n");
 
@@ -3149,13 +3427,25 @@ public class GeneradorService {
 
                 if(primeraVez){
                     writer.append("\t\t\t\t\t<li>\n" +
-                                    "\t\t\t\t\t\t<a class=\"dropdown-item px-2\" th:href=\"@{/redirect" + abreviatura + "}\"><strong><span th:text=\"'" + idioma.getNombreIdioma() + "'\"></span></strong></a>\n" +
+                                    "\t\t\t\t\t\t<a class=\"dropdown-item px-2");
+
+                    if(!colores.isTextNavDark()){
+                        writer.append(" text-light");
+                    }
+
+                    writer.append("\" th:href=\"@{/redirect" + abreviatura + "}\"><strong><span th:text=\"'" + idioma.getNombreIdioma() + "'\"></span></strong></a>\n" +
                                     "\t\t\t\t\t</li>\n");
                     primeraVez = false;
                 }else{
                     writer.append("\t\t\t\t\t<li><hr class=\"dropdown-divider\"></li>\n" +
                             "\t\t\t\t\t<li>\n" +
-                            "\t\t\t\t\t\t<a class=\"dropdown-item px-2\" th:href=\"@{/redirect" + abreviatura + "}\"><strong><span th:text=\"'" + idioma.getNombreIdioma() + "'\"></span></strong></a>\n" +
+                            "\t\t\t\t\t\t<a class=\"dropdown-item px-2");
+
+                    if(!colores.isTextNavDark()){
+                        writer.append(" text-light");
+                    }
+
+                    writer.append("\" th:href=\"@{/redirect" + abreviatura + "}\"><strong><span th:text=\"'" + idioma.getNombreIdioma() + "'\"></span></strong></a>\n" +
                             "\t\t\t\t\t</li>\n");
                 }
             }
@@ -3164,19 +3454,49 @@ public class GeneradorService {
                     "\t\t\t</div>\n" +
                     "\n" +
                     "\t\t\t<div sec:authorize=\"isAuthenticated()\" class=\"nav-item ms-3 mx-3\">\n" +
-                    "\t\t\t\t<a class=\"nav-link\" th:href=\"@{/logout}\"><strong th:text=\"#{principal.logout}\"></strong></a>\n" +
+                    "\t\t\t\t<a class=\"nav-link");
+
+            if(!colores.isTextNavDark()){
+                writer.append(" text-light");
+            }
+
+            writer.append("\" th:href=\"@{/logout}\"><strong th:text=\"#{principal.logout}\"></strong></a>\n" +
                     "\t\t\t</div>\n" +
                     "\t\t\t<div sec:authorize=\"isAnonymous()\" class=\"nav-item ms-3 mx-3\">\n" +
-                    "\t\t\t\t<a class=\"nav-link\" th:href=\"@{/login}\"><strong th:text=\"#{principal.login}\"></strong></a>\n" +
+                    "\t\t\t\t<a class=\"nav-link");
+
+            if(!colores.isTextNavDark()){
+                writer.append(" text-light");
+            }
+
+            writer.append("\" th:href=\"@{/login}\"><strong th:text=\"#{principal.login}\"></strong></a>\n" +
                     "\t\t\t</div>\n" +
                     "\t\t\t<div class=\"nav-item dropdown me-4\">\n" +
-                    "\t\t\t\t<a class=\"nav-link dropdown-toggle\" href=\"#\" role=\"button\" data-bs-toggle=\"dropdown\"><img th:src=\"@{/images/acceso.png}\" alt=\"\" height=\"30\"></a>\n" +
+                    "\t\t\t\t<a class=\"nav-link dropdown-toggle");
+
+            if(!colores.isTextNavDark()){
+                writer.append(" text-light");
+            }
+
+            writer.append("\" href=\"#\" role=\"button\" data-bs-toggle=\"dropdown\"><img th:src=\"@{/images/acceso.png}\" alt=\"\" height=\"30\"></a>\n" +
                     "\t\t\t\t<ul class=\"dropdown-menu text-center\" style=\"background-color: " + colores.getPrincipalCodeColor() + ";\">\n" +
-                    "\t\t\t\t\t<li><span sec:authorize=\"isAuthenticated()\" class=\"dropdown-item fw-bold\" sec:authentication=\"name\"></span></li>\n" +
-                    "\t\t\t\t\t<li><a sec:authorize=\"isAnonymous()\" class=\"dropdown-item\" th:href=\"@{/login}\"><strong th:text=\"#{principal.login}\"></strong></a></li>" +
+                    "\t\t\t\t\t<li><span sec:authorize=\"isAuthenticated()\" class=\"dropdown-item fw-bold");
+
+            if(!colores.isTextNavDark()){
+                writer.append(" text-light");
+            }
+
+            writer.append("\" sec:authentication=\"name\"></span></li>\n" +
+                    "\t\t\t\t\t<li><a sec:authorize=\"isAnonymous()\" class=\"dropdown-item");
+
+            if(!colores.isTextNavDark()){
+                writer.append(" text-light");
+            }
+
+            writer.append("\" th:href=\"@{/login}\"><strong th:text=\"#{principal.login}\"></strong></a></li>" +
                     "\t\t\t\t</ul>\n" +
                     "\n" +
-                    "\t\t\t</div>" +
+                    "\t\t\t</div>\n" +
                     "\t\t</div>\n" +
                     "\n" +
                     "\t</nav>\n" +
@@ -3227,17 +3547,41 @@ public class GeneradorService {
                     "\t\t<a th:href=\"@{/index}\" class=\"d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none mx-2\">\n" +
                     "\t\t\t<img th:src=\"@{/images/home.png}\" alt=\"\" height=\"30\">\n" +
                     "\t\t\t<span>&nbsp&nbsp</span>\n" +
-                    "\t\t\t<span class=\"text-dark\"><strong>" + title + "</strong></span>\n" +
+                    "\t\t\t<span class=\"");
+
+            if(!colores.isTextNavDark()){
+                writer.append("text-light");
+            }else{
+                writer.append("text-dark");
+            }
+
+            writer.append("\"><strong>" + title + "</strong></span>\n" +
                     "\t\t</a>\n" +
                     "\n" +
                     "\t\t<hr>\n" +
                     "\n" +
                     "\t\t<ul class=\"nav nav-pills flex-column mb-auto py-3\">\n" +
                     "\t\t\t<li class=\"nav-item\">\n" +
-                    "\t\t\t\t<a href=\"@{/index}\" class=\"nav-link text-dark\" aria-current=\"page\"><strong th:text=\"#{principal.home}\"></strong></a>\n" +
+                    "\t\t\t\t<a href=\"@{/index}\" class=\"nav-link ");
+
+            if(!colores.isTextNavDark()){
+                writer.append("text-light");
+            }else{
+                writer.append("text-dark");
+            }
+
+            writer.append("\" aria-current=\"page\"><strong th:text=\"#{principal.home}\"></strong></a>\n" +
                     "\t\t\t</li>\n" +
                     "\t\t\t<li class=\"mb-1\">\n" +
-                    "\t\t\t\t<button class=\"btn btn-toggle d-inline-flex align-items-center rounded border-0 collapsed text-dark\" data-bs-toggle=\"collapse\" data-bs-target=\"#home-collapse\" aria-expanded=\"true\">\n" +
+                    "\t\t\t\t<button class=\"btn btn-toggle d-inline-flex align-items-center rounded border-0 collapsed ");
+
+            if(!colores.isTextNavDark()){
+                writer.append("text-light");
+            }else{
+                writer.append("text-dark");
+            }
+
+            writer.append("\" data-bs-toggle=\"collapse\" data-bs-target=\"#home-collapse\" aria-expanded=\"true\">\n" +
                     "\t\t\t\t\t<strong th:text=\"#{principal.services}\"></strong>\n" +
                     "\t\t\t\t</button>\n" +
                     "\t\t\t\t<div class=\"collapse\" id=\"home-collapse\">\n" +
@@ -3255,13 +3599,25 @@ public class GeneradorService {
 
                 if(primeraVez){
                     for (RoleDto rol : rolesUnicos) {
-                        writer.append("\t\t\t\t\t\t\t<li sec:authorize=\"hasRole('" + rol.getRoleName().toUpperCase() + "')\"><a class=\"dropdown-item\" th:href=\"@{/" + entidad.getNombre() + "}\"><strong>" + entidad.getNombre() + "</strong></a></li>\n");
+                        writer.append("\t\t\t\t\t\t\t<li sec:authorize=\"hasRole('" + rol.getRoleName().toUpperCase() + "')\"><a class=\"dropdown-item ");
+                        if(!colores.isTextNavDark()){
+                            writer.append("text-light");
+                        }else{
+                            writer.append("text-dark");
+                        }
+                        writer.append("\" th:href=\"@{/" + entidad.getNombre() + "}\"><strong>" + entidad.getNombre() + "</strong></a></li>\n");
                     }
                     primeraVez = false;
                 }else{
                     writer.append("\t\t\t\t\t\t\t<li><hr class=\"dropdown-divider\"></li>\n");
                     for (RoleDto rol : rolesUnicos) {
-                        writer.append("\t\t\t\t\t\t\t<li sec:authorize=\"hasRole('" + rol.getRoleName().toUpperCase() + "')\"><a class=\"dropdown-item\" th:href=\"@{/" + entidad.getNombre() + "}\"><strong>" + entidad.getNombre() + "</strong></a></li>\n");
+                        writer.append("\t\t\t\t\t\t\t<li sec:authorize=\"hasRole('" + rol.getRoleName().toUpperCase() + "')\"><a class=\"dropdown-item ");
+                        if(!colores.isTextNavDark()){
+                            writer.append("text-light");
+                        }else{
+                            writer.append("text-dark");
+                        }
+                        writer.append("\" th:href=\"@{/" + entidad.getNombre() + "}\"><strong>" + entidad.getNombre() + "</strong></a></li>\n");
                     }
                 }
 
@@ -3271,23 +3627,69 @@ public class GeneradorService {
                     "\t\t\t\t</div>\n" +
                     "\t\t\t</li>\n" +
                     "\t\t\t<li sec:authorize=\"hasRole('ADMIN')\">\n" +
-                    "\t\t\t\t<a th:href=\"@{/usuarios}\" class=\"nav-link text-dark\" aria-current=\"page\"><strong th:text=\"#{principal.usuarios}\"></strong></a>\n" +
+                    "\t\t\t\t<a th:href=\"@{/usuarios}\" class=\"nav-link ");
+
+            if(!colores.isTextNavDark()){
+                writer.append("text-light");
+            }else{
+                writer.append("text-dark");
+            }
+
+            writer.append("\" aria-current=\"page\"><strong th:text=\"#{principal.usuarios}\"></strong></a>\n" +
                     "\t\t\t</li>\n" +
                     "\t\t</ul>\n" +
                     "\n" +
                     "\t\t<div sec:authorize=\"isAuthenticated()\" class=\"nav-item ms-3 mx-3\">\n" +
-                    "\t\t\t<a class=\"nav-link\" th:href=\"@{/logout}\"><strong th:text=\"#{principal.logout}\"></strong></a>\n" +
+                    "\t\t\t<a class=\"nav-link ");
+
+            if(!colores.isTextNavDark()){
+                writer.append("text-light");
+            }else{
+                writer.append("text-dark");
+            }
+
+            writer.append("\" th:href=\"@{/logout}\"><strong th:text=\"#{principal.logout}\"></strong></a>\n" +
                     "\t\t</div>\n" +
                     "\t\t<div sec:authorize=\"isAnonymous()\" class=\"nav-item ms-3 mx-3\">\n" +
-                    "\t\t\t<a class=\"nav-link\" th:href=\"@{/login}\"><strong th:text=\"#{principal.login}\"></strong></a>\n" +
+                    "\t\t\t<a class=\"nav-link ");
+
+            if(!colores.isTextNavDark()){
+                writer.append("text-light");
+            }else{
+                writer.append("text-dark");
+            }
+
+            writer.append("\" th:href=\"@{/login}\"><strong th:text=\"#{principal.login}\"></strong></a>\n" +
                     "\t\t</div>\n\n" +
                     "\t\t<hr>\n" +
                     "\n" +
                     "\t\t<div class=\"nav-item dropdown me-4\">\n" +
-                    "\t\t\t<a class=\"nav-link dropdown-toggle\" href=\"#\" role=\"button\" data-bs-toggle=\"dropdown\"><img th:src=\"@{/images/acceso.png}\" alt=\"\" height=\"30\"></a>\n" +
+                    "\t\t\t<a class=\"nav-link dropdown-toggle");
+
+            if(!colores.isTextNavDark()){
+                writer.append(" text-light");
+            }
+
+            writer.append("\" href=\"#\" role=\"button\" data-bs-toggle=\"dropdown\"><img th:src=\"@{/images/acceso.png}\" alt=\"\" height=\"30\"></a>\n" +
                     "\t\t\t<ul class=\"dropdown-menu text-center\" style=\"background-color: " + colores.getPrincipalCodeColor() + ";\">\n" +
-                    "\t\t\t\t<li><span sec:authorize=\"isAuthenticated()\" class=\"dropdown-item fw-bold\" sec:authentication=\"name\"></span></li>\n" +
-                    "\t\t\t\t<li><a sec:authorize=\"isAnonymous()\" class=\"dropdown-item\" th:href=\"@{/login}\"><strong th:text=\"#{principal.login}\"></strong></a></li>\n" +
+                    "\t\t\t\t<li><span sec:authorize=\"isAuthenticated()\" class=\"dropdown-item fw-bold ");
+
+            if(!colores.isTextNavDark()){
+                writer.append("text-light");
+            }else{
+                writer.append("text-dark");
+            }
+
+            writer.append("\" sec:authentication=\"name\"></span></li>\n" +
+                    "\t\t\t\t<li><a sec:authorize=\"isAnonymous()\" class=\"dropdown-item ");
+
+            if(!colores.isTextNavDark()){
+                writer.append("text-light");
+            }else{
+                writer.append("text-dark");
+            }
+
+            writer.append("\" th:href=\"@{/login}\"><strong th:text=\"#{principal.login}\"></strong></a></li>\n" +
                     "\t\t\t</ul>\n" +
                     "\t\t</div>" +
                     "\n" +
@@ -3295,7 +3697,13 @@ public class GeneradorService {
                     "\n" +
                     "\t\t<div class=\"nav-item dropdown me-4\">\n" +
                     "\n" +
-                    "\t\t\t<a class=\"nav-link dropdown-toggle\" href=\"#\" role=\"button\" data-bs-toggle=\"dropdown\" aria-expanded=\"false\"><strong th:text=\"#{principal.language}\"></strong></a>\n" +
+                    "\t\t\t<a class=\"nav-link dropdown-toggle");
+
+            if(!colores.isTextNavDark()){
+                writer.append(" text-light");
+            }
+
+            writer.append("\" href=\"#\" role=\"button\" data-bs-toggle=\"dropdown\" aria-expanded=\"false\"><strong th:text=\"#{principal.language}\"></strong></a>\n" +
                     "\n" +
                     "\t\t\t<ul class=\"dropdown-menu text-center\" style=\"background-color: " + colores.getPrincipalCodeColor() + ";\">\n");
 
@@ -3308,13 +3716,25 @@ public class GeneradorService {
 
                 if(primeraVez){
                     writer.append("\t\t\t\t\t<li>\n" +
-                            "\t\t\t\t\t\t<a class=\"dropdown-item px-2\" th:href=\"@{/redirect" + abreviatura + "}\"><strong><span th:text=\"'" + idioma.getNombreIdioma() + "'\"></span></strong></a>\n" +
+                            "\t\t\t\t\t\t<a class=\"dropdown-item px-2 ");
+                    if(!colores.isTextNavDark()){
+                        writer.append("text-light");
+                    }else{
+                        writer.append("text-dark");
+                    }
+                    writer.append("\" th:href=\"@{/redirect" + abreviatura + "}\"><strong><span th:text=\"'" + idioma.getNombreIdioma() + "'\"></span></strong></a>\n" +
                             "\t\t\t\t\t</li>\n");
                     primeraVez = false;
                 }else{
                     writer.append("\t\t\t\t\t<li><hr class=\"dropdown-divider\"></li>\n" +
                             "\t\t\t\t\t<li>\n" +
-                            "\t\t\t\t\t\t<a class=\"dropdown-item px-2\" th:href=\"@{/redirect" + abreviatura + "}\"><strong><span th:text=\"'" + idioma.getNombreIdioma() + "'\"></span></strong></a>\n" +
+                            "\t\t\t\t\t\t<a class=\"dropdown-item px-2 ");
+                    if(!colores.isTextNavDark()){
+                        writer.append("text-light");
+                    }else{
+                        writer.append("text-dark");
+                    }
+                    writer.append("\" th:href=\"@{/redirect" + abreviatura + "}\"><strong><span th:text=\"'" + idioma.getNombreIdioma() + "'\"></span></strong></a>\n" +
                             "\t\t\t\t\t</li>\n");
                 }
             }
@@ -3459,7 +3879,7 @@ public class GeneradorService {
      * @param title Titulo
      * @throws PropertiesException Excepcion
      */
-    private void generatePropertiesDocs(List<Idioma> idiomas, Idioma defaultLanguage, String title, String nameDB, int numPuerto) throws PropertiesException{
+    private void generatePropertiesDocs(List<Idioma> idiomas, Idioma defaultLanguage, String title, String nameDB, int numPuerto, int numPuertoDB) throws PropertiesException{
 
         File f = null;
         FileWriter writer = null;
@@ -3473,7 +3893,7 @@ public class GeneradorService {
             writer.append("#Data source\n" +
                     "spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver\n" +
                     "\n" +
-                    "spring.datasource.url=jdbc:mysql://localhost:3306/" + nameDB + "\n" +
+                    "spring.datasource.url=jdbc:mysql://localhost:" + numPuertoDB + "/" + nameDB + "\n" +
                     "\n" +
                     "spring.datasource.username=root\n" +
                     "spring.datasource.password=avbavbMysql\n" +

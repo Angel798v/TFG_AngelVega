@@ -5,21 +5,12 @@ import com.example.generador.model.Project;
 import com.example.generador.service.*;
 import com.example.generador.util.ColorPick;
 import com.example.generador.util.UsuarioAdminCredentials;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpServletResponseWrapper;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
 
 import java.io.*;
 import java.util.HashSet;
@@ -62,6 +53,9 @@ public class GeneradorController {
 
     @Autowired
     private DesignService designService;
+
+    @Autowired
+    private RestartService restartService;
 
 
     /**
@@ -202,8 +196,8 @@ public class GeneradorController {
             rolesService.addRole(new RoleDto(1,"ADMIN"));
         }
 
-        model.addAttribute("title",projectService.getTitleProject());
-        model.addAttribute("abrTitle",projectService.getAbbreviatedTitleProject());
+        model.addAttribute("title", projectService.getTitleProject());
+        model.addAttribute("abrTitle", projectService.getAbbreviatedTitleProject());
 
         return "/Generador/IndexGenerador";
     }
@@ -214,10 +208,9 @@ public class GeneradorController {
      * @return Vista instrucciones post-descarga
      */
     @PostMapping("/GenerateApplication")
-    public void generateApplication(HttpServletResponse response) throws Exception{
+    public String generateApplication() throws Exception{
 
         try {
-
             //Generación proyecto
 
             generadorService.createDirectories();
@@ -234,37 +227,11 @@ public class GeneradorController {
             zipOut.close();
             fos.close();
 
-            //Descarga proyecto comprimido
-
-            response.setContentType("application/zip");
-            response.setHeader("Content-Disposition", "attachment;filename=" + projectService.getTitleProject() + ".zip");
-            response.setStatus(HttpServletResponse.SC_OK);
-
-            InputStream is = new FileInputStream(projectService.getTitleProject() + ".zip");
-            IOUtils.copy(is, response.getOutputStream());
-
-            response.flushBuffer();
-
-            /*
-            ZipOutputStream zippedOut = new ZipOutputStream(response.getOutputStream());
-
-            FileSystemResource resource = new FileSystemResource(file);
-
-            ZipEntry e = new ZipEntry(resource.getFilename());
-            e.setSize(resource.contentLength());
-            e.setTime(System.currentTimeMillis());
-            zippedOut.putNextEntry(e);
-            StreamUtils.copy(resource.getInputStream(), zippedOut);
-            zippedOut.closeEntry();
-
-            zippedOut.finish();
-            */
-
         }catch (Exception ex){
             throw new Exception(ex.getMessage());
         }
 
-        //return "redirect:/IndexGenerador";
+        return "redirect:/vistaFinalProyecto";
     }
 
     private static void zipFile(File fileToZip, String fileName, ZipOutputStream zipOut) throws IOException {
@@ -280,6 +247,7 @@ public class GeneradorController {
                 zipOut.closeEntry();
             }
             File[] children = fileToZip.listFiles();
+            assert children != null : "No hay archivos";
             for (File childFile : children) {
                 zipFile(childFile, fileName + "/" + childFile.getName(), zipOut);
             }
@@ -295,6 +263,90 @@ public class GeneradorController {
         }
         fis.close();
     }
+
+
+    @PostMapping("/descargaProyecto")
+    public void descargaProyecto(HttpServletResponse response){
+
+        try {
+            //Descarga proyecto comprimido
+
+            response.setContentType("application/zip");
+            response.setHeader("Content-Disposition", "attachment;filename=" + projectService.getTitleProject() + ".zip");
+            response.setStatus(HttpServletResponse.SC_OK);
+
+            InputStream is = new FileInputStream(projectService.getTitleProject() + ".zip");
+            IOUtils.copy(is, response.getOutputStream());
+
+            response.flushBuffer();
+
+        /*
+            ZipOutputStream zippedOut = new ZipOutputStream(response.getOutputStream());
+
+            FileSystemResource resource = new FileSystemResource(file);
+
+            ZipEntry e = new ZipEntry(resource.getFilename());
+            e.setSize(resource.contentLength());
+            e.setTime(System.currentTimeMillis());
+            zippedOut.putNextEntry(e);
+            StreamUtils.copy(resource.getInputStream(), zippedOut);
+            zippedOut.closeEntry();
+
+            zippedOut.finish();
+            */
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
+    }
+
+
+    /**
+     * Vista final del proyecto generado.
+     * @param response Response
+     * @return Vista
+     */
+    @GetMapping("/vistaFinalProyecto")
+    public String vistaFinalProyecto(HttpServletResponse response){
+
+        urlService.setUrl("/vistaFinalProyecto");
+
+        return "/Generador/vistaFinal";
+    }
+
+
+    /**
+     * Vista intrucciones POST descarga.
+     * @param model Model
+     * @return Vista
+     */
+    @GetMapping("/vistaFinalProyecto/instrucciones")
+    public String vistaInstrucciones(Model model){
+
+        urlService.setUrl("/vistaFinalProyecto/instrucciones");
+
+        model.addAttribute("projectName", projectService.getTitleProject());
+        model.addAttribute("databaseName", projectService.getNameDB());
+        model.addAttribute("portNumber", projectService.getNumPuerto());
+        model.addAttribute("portNumberDB", projectService.getNumPuertoDB());
+
+        return "/Generador/instrucciones";
+    }
+
+
+    /**
+     * Método que elimina el proyecto generado para que el usuario vuelva a realizar cambios.
+     * @return Vista indexGenerador
+     */
+    @GetMapping("/eliminarProyectoGenerado")
+    public String eliminarProyectoGenerado(){
+
+        restartService.deleteOnCascade(new File(projectService.getTitleProject()));
+        restartService.deleteOnCascade(new File(projectService.getTitleProject() + ".zip"));
+
+        return "redirect:/IndexGenerador";
+    }
+
+
 
 
     /**
@@ -359,10 +411,10 @@ public class GeneradorController {
         UsuarioAdminCredentials usuarioAdmin = new UsuarioAdminCredentials("angel@gmail.com","angelAdmin","admin", atributos, null);
         usuarioService.setAdmin(usuarioAdmin);
 
-        AtributoDto atributo = new AtributoDto("apellidos","String",false,false,true,false,"",false,"",15);
+        AtributoDto atributo = new AtributoDto("Apellidos","String",false,false,true,false,"",false,"",15);
         usuarioService.addAtributosUsuario(atributo);
 
-        AtributoDto atributo2 = new AtributoDto("direccion","String",false,false,false,false,"",false,"",20);
+        AtributoDto atributo2 = new AtributoDto("Direccion","String",false,false,false,false,"",false,"",20);
         usuarioService.addAtributosUsuario(atributo2);
 
 
@@ -388,6 +440,7 @@ public class GeneradorController {
         projectService.setNameApplication("WorkShop");
         projectService.setNameDB("taller");
         projectService.setNumPuerto(8092);
+        projectService.setNumPuertoDB(3306);
 
         //SECURITY
 
@@ -421,7 +474,7 @@ public class GeneradorController {
         rolesService.setDefaultRole(user);
 
         //DISEÑO
-        designService.setColores(new ColorPick("#8ED8F1","#FFFFFF", "#FEF9C7",false));
+        designService.setColores(new ColorPick("#8ED8F1","#FFFFFF", "#FEF9C7",false, true));
         designService.switchNav();
 
 

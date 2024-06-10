@@ -24,6 +24,8 @@ public class ProjectService {
 
     private int numPuerto;
 
+    private int numPuertoDB;
+
     private boolean datosIntroducidos;
 
     @Autowired

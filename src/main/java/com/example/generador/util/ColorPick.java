@@ -18,4 +18,6 @@ public class ColorPick {
     private String tertiaryCodeColor;
 
     private boolean textDark;
+
+    private boolean textNavDark;
 }

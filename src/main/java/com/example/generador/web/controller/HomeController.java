@@ -1,6 +1,8 @@
 package com.example.generador.web.controller;
 
 import com.example.generador.dto.RoleDto;
+import com.example.generador.service.ProjectService;
+import com.example.generador.service.RestartService;
 import com.example.generador.service.UrlService;
 import com.example.generador.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,7 +11,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,18 +21,22 @@ import java.util.List;
 @Controller
 public class HomeController {
 
-    @Autowired
-    private UsuarioService usuarioService;
-
-
     /**
      * Booleano que indica si se ha realizado la comprobación de si hay un administrador
      */
     private boolean adminComprobacion = false;
 
+    @Autowired
+    private UsuarioService usuarioService;
+
+    @Autowired
+    private RestartService restartService;
 
     @Autowired
     private UrlService urlService;
+
+    @Autowired
+    private ProjectService projectService;
 
 
     /**
@@ -74,7 +82,7 @@ public class HomeController {
      * @return Vista
      */
     @GetMapping("/index")
-    public String vistaIndex(Model model){
+    public String vistaIndex(Model model, @RequestParam(required = false) boolean restart){
 
         urlService.setUrl("/index");
 
@@ -84,6 +92,12 @@ public class HomeController {
             model.addAttribute("userConnected", false);
         }else{
             model.addAttribute("userConnected", true);
+        }
+
+        if(restart){
+            restartService.deleteOnCascade(new File(projectService.getTitleProject()));
+            restartService.deleteOnCascade(new File(projectService.getTitleProject() + ".zip"));
+            restartService.restartAllServices();
         }
 
         return "index";

@@ -28,5 +28,7 @@ public class ProjectDto {
 
     private int numPuerto;
 
+    private int numPuertoDB;
+
 
 }

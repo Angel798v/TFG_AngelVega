@@ -24,9 +24,6 @@ import java.util.ArrayList;
 @Setter
 public class SecurityController {
 
-
-    private boolean flagAdminUser = false;
-
     @Autowired
     private RolesService rolesService;
 
@@ -49,7 +46,8 @@ public class SecurityController {
         urlService.setUrl("/SecurityProperties");
 
         model.addAttribute("adminUser", usuarioService.getAdmin());
-        model.addAttribute("isAdminUser",isFlagAdminUser());
+        model.addAttribute("atributosUsuario", usuarioService.getAtributosUsuario());
+        model.addAttribute("isAdminUser",usuarioService.isFlagAdminUser());
         model.addAttribute("roles",rolesService.getRoles());
         model.addAttribute("entidades",entidadesService.getEntidades());
         model.addAttribute("defaultRole", rolesService.getDefaultRole());
@@ -68,10 +66,10 @@ public class SecurityController {
     @GetMapping("/registrarAdmin")
     public String vistaRegistrarAdmin(Model model){
 
-        if(usuarioService.getAdmin() != null){
+        if(usuarioService.isFlagAdminUser()){
             model.addAttribute("usuarioAdmin",usuarioService.getAdmin());
         }else{
-            model.addAttribute("usuarioAdmin",new UsuarioAdminCredentials());
+            model.addAttribute("usuarioAdmin",new UsuarioAdminCredentials(usuarioService.getAtributosUsuario()));
         }
 
         urlService.setUrl("/registrarAdmin");
@@ -88,9 +86,11 @@ public class SecurityController {
     @PostMapping("/registrarAdmin")
     public String registrarAdmin(UsuarioAdminCredentials usuarioAdmin){
 
-        usuarioAdmin.setAtributos(usuarioService.getAdmin().getAtributos());
+        if(usuarioService.getAdmin() != null) {
+            usuarioAdmin.setAtributos(usuarioService.getAdmin().getAtributos());
+        }
 
-        setFlagAdminUser(true);
+        usuarioService.setFlagAdminUser(true);
         usuarioService.setAdmin(usuarioAdmin);
 
         return "redirect:/SecurityProperties?exitoAdmin";
@@ -104,8 +104,8 @@ public class SecurityController {
     @GetMapping("/eliminarUserAdmin")
     public String removeUserAdmin(){
 
-        setFlagAdminUser(false);
-        usuarioService.setAdmin(null);
+        usuarioService.setFlagAdminUser(false);
+        usuarioService.getAdmin().clearAdmin();
 
         return "redirect:/SecurityProperties?removedAdmin";
     }

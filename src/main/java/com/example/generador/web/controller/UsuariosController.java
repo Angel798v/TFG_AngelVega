@@ -100,17 +100,19 @@ public class UsuariosController {
     @PostMapping("/addAtributoUsuario")
     public String creacionAtributosUsuario(AtributoDto atributo){
 
-        String letraInicial, resto, nombreCompleto = null;
+        String letraInicial, resto, nombreCompleto;
 
         nombreCompleto = atributo.getNombre().replace(" ","");
 
-        letraInicial = nombreCompleto.substring(0,1).toLowerCase();
+        letraInicial = nombreCompleto.substring(0,1).toUpperCase();
         resto = nombreCompleto.substring(1);
         nombreCompleto = letraInicial + resto;
 
         atributo.setNombre(nombreCompleto);
 
         if(usuarioService.addAtributosUsuario(atributo)){
+            usuarioService.setFlagAdminUser(false);
+            usuarioService.getAdmin().clearAdmin();
             return "redirect:/atributosUsuario?exito";
         }else{
             return "redirect:/atributosUsuario?fallo";
@@ -125,6 +127,8 @@ public class UsuariosController {
     public String clearAtributosUsuario(){
 
         usuarioService.clearAtributosUsuario();
+        usuarioService.setFlagAdminUser(false);
+        usuarioService.getAdmin().clearAdmin();
 
         return "redirect:/atributosUsuario?clear";
     }

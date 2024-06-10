@@ -29,6 +29,7 @@
                             <td><strong th:text="#{security.userAdmin.email}"></strong> </td>
                             <td><strong th:text="#{security.userAdmin.username}"></strong></td>
                             <td><strong th:text="#{security.userAdmin.password}"></strong> </td>
+                            <td th:each="atributo : ${atributosUsuario}"><strong th:text="${atributo.nombre}"></strong></td>
                         </tr>
                     </thead>
                     <tbody>
@@ -36,6 +37,7 @@
                             <td th:text="${adminUser.getEmail()}"></td>
                             <td th:text="${adminUser.getUsername()}"></td>
                             <td th:text="${adminUser.getPassword()}"></td>
+                            <td th:each="valor : ${adminUser.valores}"><span th:text="${valor}"></span></td>
                         </tr>
                     </tbody>
                 </table>
