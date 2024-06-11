@@ -68,7 +68,8 @@ public class RegistroUsuariosController {
     public String registrarUsuario(@ModelAttribute("usuario") UsuarioDtoPsw usuarioDtoPsw){
 
         if(usuarioRepository.findByNombreUsuario(usuarioDtoPsw.getNombreUsuario()) != null ||
-                usuarioRepository.findByEmail(usuarioDtoPsw.getEmail()) != null){
+                usuarioRepository.findByEmail(usuarioDtoPsw.getEmail()) != null ||
+                usuarioDtoPsw.getNombreUsuario().equals(usuarioDtoPsw.getPassword())){
             return "redirect:/registro?error";
         }
 
@@ -104,7 +105,8 @@ public class RegistroUsuariosController {
     public String userRegistryAdmin(UsuarioDtoPsw usuarioDtoPsw){
 
         if(usuarioRepository.findByNombreUsuario(usuarioDtoPsw.getNombreUsuario()) != null ||
-            usuarioRepository.findByEmail(usuarioDtoPsw.getEmail()) != null){
+                usuarioRepository.findByEmail(usuarioDtoPsw.getEmail()) != null ||
+                usuarioDtoPsw.getNombreUsuario().equals(usuarioDtoPsw.getPassword())){
             return "redirect:/usuarios?fallo";
         }
 

@@ -135,6 +135,7 @@ public class GeneradorController {
             project.setNameApplication(projectService.getNameApplication());
             project.setNameDB(projectService.getNameDB());
             project.setNumPuerto(projectService.getNumPuerto());
+            project.setNumPuertoDB(projectService.getNumPuertoDB());
         }
 
 
@@ -165,6 +166,7 @@ public class GeneradorController {
         projectService.setNameApplication(nameApplication);
         projectService.setNameDB(projectDto.getNameDB());
         projectService.setNumPuerto(projectDto.getNumPuerto());
+        projectService.setNumPuertoDB(projectDto.getNumPuertoDB());
 
         Project project = new Project();
 

@@ -128,7 +128,9 @@ public class UsuariosController {
 
         usuarioService.clearAtributosUsuario();
         usuarioService.setFlagAdminUser(false);
-        usuarioService.getAdmin().clearAdmin();
+        if(usuarioService.getAdmin() != null){
+            usuarioService.getAdmin().clearAdmin();
+        }
 
         return "redirect:/atributosUsuario?clear";
     }

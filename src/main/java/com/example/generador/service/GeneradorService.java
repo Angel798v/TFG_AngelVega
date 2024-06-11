@@ -180,6 +180,7 @@ public class GeneradorService {
             writer.append("import java.io.Serializable;\n");
             writer.append("import lombok.*;\n");
             writer.append("import java.util.*;\n");
+            writer.append("import java.sql.Date;\n");
             writer.append("import java.sql.*;\n\n");
 
 
@@ -255,7 +256,7 @@ public class GeneradorService {
                         aux += "\t@Temporal(TemporalType.TIMESTAMP)\n";
                     }
 
-                    aux += "\tprivate " + atr.getTipo() + " " + atr.getNombre().toLowerCase() + ";\n\n\n";
+                    aux += "\tprivate " + atr.getTipo() + " " + atr.getNombre() + ";\n\n\n";
                     writer.append(aux);
                 }
             }
@@ -455,6 +456,7 @@ public class GeneradorService {
             writer.append("package " + this.pathCode + ".dto;\n\n");
 
             writer.append("import lombok.*;\n\n");
+            writer.append("import java.sql.Date;\n");
 
             //Anotaciones
             writer.append("@Getter\n");
@@ -466,7 +468,7 @@ public class GeneradorService {
 
             //Atributos
             for(AtributoDto atributo : entidad.getAtributos()) {
-                if(atributo.getTipo().equals("Time") || atributo.getTipo().equals("Timestamp")){
+                if(atributo.getTipo().equals("Time") || atributo.getTipo().equals("Timestamp") || atributo.getTipo().equals("Date")){
                     writer.append("\tprivate String " + atributo.getNombre() + ";\n\n");
                 }else {
                     writer.append("\tprivate " + atributo.getTipo() + " " + atributo.getNombre() + ";\n\n");
@@ -594,6 +596,7 @@ public class GeneradorService {
                 writer.append("import org.springframework.security.core.Authentication;\n");
                 writer.append("import org.springframework.security.core.context.SecurityContextHolder;\n");
                 writer.append("import java.sql.Time;\n" +
+                        "import java.sql.Date;\n" +
                         "import java.sql.Timestamp;\n" +
                         "import java.time.LocalDateTime;\n" +
                         "import java.time.LocalTime;\n");
@@ -707,7 +710,7 @@ public class GeneradorService {
                 String letraInicial, resto, nombreCompleto = null;
                 for (AtributoDto atr : entidad.getAtributos()) {
                     if (!atr.isPrimaryKey()) {
-                        if(!atr.getTipo().equals("Time") && !atr.getTipo().equals("Timestamp")) {
+                        if(!atr.getTipo().equals("Time") && !atr.getTipo().equals("Timestamp") && !atr.getTipo().equals("Date")) {
                             letraInicial = atr.getNombre().substring(0, 1).toUpperCase();
                             resto = atr.getNombre().substring(1);
                             nombreCompleto = letraInicial + resto;
@@ -717,12 +720,32 @@ public class GeneradorService {
                                 letraInicial = atr.getNombre().substring(0, 1).toUpperCase();
                                 resto = atr.getNombre().substring(1);
                                 nombreCompleto = letraInicial + resto;
-                                writer.append("\t\t" + entidad.getNombre().toLowerCase() + ".set" + nombreCompleto + "(Time.valueOf(LocalTime.parse(" + entidad.getNombre().toLowerCase() + "Dto.get" + nombreCompleto + "())));\n");
+                                if(atr.isNullable()){
+                                    writer.append("\t\tif(!" + entidad.getNombre().toLowerCase() + "Dto.get" + nombreCompleto + "().isBlank()){\n");
+                                    writer.append("\t\t\t" + entidad.getNombre().toLowerCase() + ".set" + nombreCompleto + "(Time.valueOf(LocalTime.parse(" + entidad.getNombre().toLowerCase() + "Dto.get" + nombreCompleto + "())));\n\t\t}\n");
+                                }else{
+                                    writer.append("\t\t" + entidad.getNombre().toLowerCase() + ".set" + nombreCompleto + "(Time.valueOf(LocalTime.parse(" + entidad.getNombre().toLowerCase() + "Dto.get" + nombreCompleto + "())));\n");
+                                }
+                            }else if(atr.getTipo().equals("Timestamp")){
+                                letraInicial = atr.getNombre().substring(0, 1).toUpperCase();
+                                resto = atr.getNombre().substring(1);
+                                nombreCompleto = letraInicial + resto;
+                                if(atr.isNullable()){
+                                    writer.append("\t\tif(!" + entidad.getNombre().toLowerCase() + "Dto.get" + nombreCompleto + "().isBlank()){\n");
+                                    writer.append("\t\t\t" + entidad.getNombre().toLowerCase() + ".set" + nombreCompleto + "(Timestamp.valueOf(LocalDateTime.parse(" + entidad.getNombre().toLowerCase() + "Dto.get" + nombreCompleto + "())));\n\t\t}\n");
+                                }else{
+                                    writer.append("\t\t" + entidad.getNombre().toLowerCase() + ".set" + nombreCompleto + "(Timestamp.valueOf(LocalDateTime.parse(" + entidad.getNombre().toLowerCase() + "Dto.get" + nombreCompleto + "())));\n");
+                                }
                             }else{
                                 letraInicial = atr.getNombre().substring(0, 1).toUpperCase();
                                 resto = atr.getNombre().substring(1);
                                 nombreCompleto = letraInicial + resto;
-                                writer.append("\t\t" + entidad.getNombre().toLowerCase() + ".set" + nombreCompleto + "(Timestamp.valueOf(LocalDateTime.parse(" + entidad.getNombre().toLowerCase() + "Dto.get" + nombreCompleto + "())));\n");
+                                if(atr.isNullable()){
+                                    writer.append("\t\tif(!" + entidad.getNombre().toLowerCase() + "Dto.get" + nombreCompleto + "().isBlank()){\n");
+                                    writer.append("\t\t\t" + entidad.getNombre().toLowerCase() + ".set" + nombreCompleto + "(Date.valueOf(" + entidad.getNombre().toLowerCase() + "Dto.get" + nombreCompleto + "()));\n\t\t}\n");
+                                }else{
+                                    writer.append("\t\t" + entidad.getNombre().toLowerCase() + ".set" + nombreCompleto + "(Date.valueOf(" + entidad.getNombre().toLowerCase() + "Dto.get" + nombreCompleto + "()));\n");
+                                }
                             }
                         }
                     }
@@ -744,7 +767,11 @@ public class GeneradorService {
 
                 writer.append("\t\t" + entidad.getNombre().toLowerCase() + ".setUser(user);\n\n");
 
-                writer.append("\t\t" + entidad.getNombre().toLowerCase() + "Repository.save(" + entidad.getNombre().toLowerCase() + ");\n\n");
+                writer.append("\t\ttry{\n" +
+                        "\t\t\t" + entidad.getNombre().toLowerCase() + "Repository.save(" + entidad.getNombre().toLowerCase() + ");\n" +
+                        "\t\t}catch (Exception ex){\n" +
+                        "\t\t\treturn \"redirect:/" + entidad.getNombre() + "?failPost\";\n\t\t}\n\n");
+
                 writer.append("\t\treturn \"redirect:/" + entidad.getNombre() + "?successPost\";\n\t}\n\n");
 
 
@@ -761,7 +788,7 @@ public class GeneradorService {
                 writer.append("\t\t" + entidad.getNombre() + " " + entidad.getNombre().toLowerCase() + " = " + entidad.getNombre().toLowerCase() + "Repository.findById(id);\n");
                 writer.append("\t\t" + entidad.getNombre() + "Dto " + entidad.getNombre().toLowerCase() + "Dto = new " + entidad.getNombre() + "Dto();\n\n");
                 for (AtributoDto atr : entidad.getAtributos()) {
-                    if(!atr.getTipo().equals("Time") && !atr.getTipo().equals("Timestamp")) {
+                    if(!atr.getTipo().equals("Time") && !atr.getTipo().equals("Timestamp") && !atr.getTipo().equals("Date")) {
                         letraInicial = atr.getNombre().substring(0, 1).toUpperCase();
                         resto = atr.getNombre().substring(1);
                         nombreCompleto = letraInicial + resto;
@@ -837,7 +864,7 @@ public class GeneradorService {
                 writer.append("\t\t" + entidad.getNombre() + " " + entidad.getNombre().toLowerCase() + " = " + entidad.getNombre().toLowerCase() + "Repository.findById(id);\n");
                 for (AtributoDto atr : entidad.getAtributos()) {
                     if (!atr.isPrimaryKey()) {
-                        if(!atr.getTipo().equals("Time") && !atr.getTipo().equals("Timestamp")) {
+                        if(!atr.getTipo().equals("Time") && !atr.getTipo().equals("Timestamp") && !atr.getTipo().equals("Date")) {
                             letraInicial = atr.getNombre().substring(0, 1).toUpperCase();
                             resto = atr.getNombre().substring(1);
                             nombreCompleto = letraInicial + resto;
@@ -847,12 +874,32 @@ public class GeneradorService {
                                 letraInicial = atr.getNombre().substring(0, 1).toUpperCase();
                                 resto = atr.getNombre().substring(1);
                                 nombreCompleto = letraInicial + resto;
-                                writer.append("\t\t" + entidad.getNombre().toLowerCase() + ".set" + nombreCompleto + "(Time.valueOf(LocalTime.parse(" + entidad.getNombre().toLowerCase() + "Dto.get" + nombreCompleto + "())));\n");
+                                if(atr.isNullable()){
+                                    writer.append("\t\tif(!" + entidad.getNombre().toLowerCase() + "Dto.get" + nombreCompleto + "().isBlank()){\n");
+                                    writer.append("\t\t\t" + entidad.getNombre().toLowerCase() + ".set" + nombreCompleto + "(Time.valueOf(LocalTime.parse(" + entidad.getNombre().toLowerCase() + "Dto.get" + nombreCompleto + "())));\n\t\t}\n");
+                                }else{
+                                    writer.append("\t\t" + entidad.getNombre().toLowerCase() + ".set" + nombreCompleto + "(Time.valueOf(LocalTime.parse(" + entidad.getNombre().toLowerCase() + "Dto.get" + nombreCompleto + "())));\n");
+                                }
+                            }else if(atr.getTipo().equals("Timestamp")){
+                                letraInicial = atr.getNombre().substring(0, 1).toUpperCase();
+                                resto = atr.getNombre().substring(1);
+                                nombreCompleto = letraInicial + resto;
+                                if(atr.isNullable()){
+                                    writer.append("\t\tif(!" + entidad.getNombre().toLowerCase() + "Dto.get" + nombreCompleto + "().isBlank()){\n");
+                                    writer.append("\t\t\t" + entidad.getNombre().toLowerCase() + ".set" + nombreCompleto + "(Timestamp.valueOf(LocalDateTime.parse(" + entidad.getNombre().toLowerCase() + "Dto.get" + nombreCompleto + "())));\n\t\t}\n");
+                                }else{
+                                    writer.append("\t\t" + entidad.getNombre().toLowerCase() + ".set" + nombreCompleto + "(Timestamp.valueOf(LocalDateTime.parse(" + entidad.getNombre().toLowerCase() + "Dto.get" + nombreCompleto + "())));\n");
+                                }
                             }else{
                                 letraInicial = atr.getNombre().substring(0, 1).toUpperCase();
                                 resto = atr.getNombre().substring(1);
                                 nombreCompleto = letraInicial + resto;
-                                writer.append("\t\t" + entidad.getNombre().toLowerCase() + ".set" + nombreCompleto + "(Timestamp.valueOf(LocalDateTime.parse(" + entidad.getNombre().toLowerCase() + "Dto.get" + nombreCompleto + "())));\n");
+                                if(atr.isNullable()){
+                                    writer.append("\t\tif(!" + entidad.getNombre().toLowerCase() + "Dto.get" + nombreCompleto + "().isBlank()){\n");
+                                    writer.append("\t\t\t" + entidad.getNombre().toLowerCase() + ".set" + nombreCompleto + "(Date.valueOf(" + entidad.getNombre().toLowerCase() + "Dto.get" + nombreCompleto + "()));\n\t\t}\n");
+                                }else{
+                                    writer.append("\t\t" + entidad.getNombre().toLowerCase() + ".set" + nombreCompleto + "(Date.valueOf(" + entidad.getNombre().toLowerCase() + "Dto.get" + nombreCompleto + "()));\n");
+                                }
                             }
                         }
                     }
@@ -875,7 +922,11 @@ public class GeneradorService {
 
                 writer.append("\t\t" + entidad.getNombre().toLowerCase() + ".setUser(user);\n\n");
 
-                writer.append("\t\t" + entidad.getNombre().toLowerCase() + "Repository.save(" + entidad.getNombre().toLowerCase() + ");\n\n");
+                writer.append("\t\ttry{\n" +
+                        "\t\t\t" + entidad.getNombre().toLowerCase() + "Repository.save(" + entidad.getNombre().toLowerCase() + ");\n" +
+                        "\t\t}catch (Exception ex){\n" +
+                        "\t\t\treturn \"redirect:/" + entidad.getNombre() + "?failPut\";\n\t\t}\n\n");
+
                 writer.append("\t\treturn \"redirect:/" + entidad.getNombre() + "?successPut\";\n\t}\n\n");
 
 
@@ -913,6 +964,7 @@ public class GeneradorService {
                 writer.append("import org.springframework.web.bind.annotation.*;\n");
                 writer.append("import org.springframework.security.core.Authentication;\n");
                 writer.append("import org.springframework.security.core.context.SecurityContextHolder;\n");
+                writer.append("import java.sql.Date;\n");
                 writer.append("import java.util.*;\n");
                 writer.append("import java.sql.Time;\n" +
                         "import java.sql.Timestamp;\n" +
@@ -1019,7 +1071,7 @@ public class GeneradorService {
                 String letraInicial, resto, nombreCompleto = null;
                 for (AtributoDto atr : entidad.getAtributos()) {
                     if (!atr.isPrimaryKey()) {
-                        if(!atr.getTipo().equals("Time") && !atr.getTipo().equals("Timestamp")) {
+                        if(!atr.getTipo().equals("Time") && !atr.getTipo().equals("Timestamp") && !atr.getTipo().equals("Date")) {
                             letraInicial = atr.getNombre().substring(0, 1).toUpperCase();
                             resto = atr.getNombre().substring(1);
                             nombreCompleto = letraInicial + resto;
@@ -1029,12 +1081,32 @@ public class GeneradorService {
                                 letraInicial = atr.getNombre().substring(0, 1).toUpperCase();
                                 resto = atr.getNombre().substring(1);
                                 nombreCompleto = letraInicial + resto;
-                                writer.append("\t\t" + entidad.getNombre().toLowerCase() + ".set" + nombreCompleto + "(Time.valueOf(LocalTime.parse(" + entidad.getNombre().toLowerCase() + "Dto.get" + nombreCompleto + "())));\n");
+                                if(atr.isNullable()){
+                                    writer.append("\t\tif(!" + entidad.getNombre().toLowerCase() + "Dto.get" + nombreCompleto + "().isBlank()){\n");
+                                    writer.append("\t\t\t" + entidad.getNombre().toLowerCase() + ".set" + nombreCompleto + "(Time.valueOf(LocalTime.parse(" + entidad.getNombre().toLowerCase() + "Dto.get" + nombreCompleto + "())));\n\t\t}\n");
+                                }else{
+                                    writer.append("\t\t" + entidad.getNombre().toLowerCase() + ".set" + nombreCompleto + "(Time.valueOf(LocalTime.parse(" + entidad.getNombre().toLowerCase() + "Dto.get" + nombreCompleto + "())));\n");
+                                }
+                            }else if(atr.getTipo().equals("Timestamp")){
+                                letraInicial = atr.getNombre().substring(0, 1).toUpperCase();
+                                resto = atr.getNombre().substring(1);
+                                nombreCompleto = letraInicial + resto;
+                                if(atr.isNullable()){
+                                    writer.append("\t\tif(!" + entidad.getNombre().toLowerCase() + "Dto.get" + nombreCompleto + "().isBlank()){\n");
+                                    writer.append("\t\t\t" + entidad.getNombre().toLowerCase() + ".set" + nombreCompleto + "(Timestamp.valueOf(LocalDateTime.parse(" + entidad.getNombre().toLowerCase() + "Dto.get" + nombreCompleto + "())));\n\t\t}\n");
+                                }else{
+                                    writer.append("\t\t" + entidad.getNombre().toLowerCase() + ".set" + nombreCompleto + "(Timestamp.valueOf(LocalDateTime.parse(" + entidad.getNombre().toLowerCase() + "Dto.get" + nombreCompleto + "())));\n");
+                                }
                             }else{
                                 letraInicial = atr.getNombre().substring(0, 1).toUpperCase();
                                 resto = atr.getNombre().substring(1);
                                 nombreCompleto = letraInicial + resto;
-                                writer.append("\t\t" + entidad.getNombre().toLowerCase() + ".set" + nombreCompleto + "(Timestamp.valueOf(LocalDateTime.parse(" + entidad.getNombre().toLowerCase() + "Dto.get" + nombreCompleto + "())));\n");
+                                if(atr.isNullable()){
+                                    writer.append("\t\tif(!" + entidad.getNombre().toLowerCase() + "Dto.get" + nombreCompleto + "().isBlank()){\n");
+                                    writer.append("\t\t\t" + entidad.getNombre().toLowerCase() + ".set" + nombreCompleto + "(Date.valueOf(" + entidad.getNombre().toLowerCase() + "Dto.get" + nombreCompleto + "()));\n\t\t}\n");
+                                }else{
+                                    writer.append("\t\t" + entidad.getNombre().toLowerCase() + ".set" + nombreCompleto + "(Date.valueOf(" + entidad.getNombre().toLowerCase() + "Dto.get" + nombreCompleto + "()));\n");
+                                }
                             }
                         }
                     }
@@ -1054,7 +1126,10 @@ public class GeneradorService {
                     }
                 }
                 writer.append("\t\t" + entidad.getNombre().toLowerCase() + ".setUser(user);\n\n");
-                writer.append("\t\t" + entidad.getNombre().toLowerCase() + "Repository.save(" + entidad.getNombre().toLowerCase() + ");\n\n");
+                writer.append("\t\ttry{\n" +
+                        "\t\t\t" + entidad.getNombre().toLowerCase() + "Repository.save(" + entidad.getNombre().toLowerCase() + ");\n" +
+                        "\t\t}catch (Exception ex){\n" +
+                        "\t\t\treturn \"redirect:/" + entidad.getNombre() + "?failPost\";\n\t\t}\n\n");
                 writer.append("\t\treturn \"redirect:/" + entidad.getNombre() + "?successPost\";\n\t}\n\n");
 
 
@@ -1066,7 +1141,7 @@ public class GeneradorService {
                 writer.append("\t\t" + entidad.getNombre() + " " + entidad.getNombre().toLowerCase() + " = " + entidad.getNombre().toLowerCase() + "Repository.findById(id);\n");
                 writer.append("\t\t" + entidad.getNombre() + "Dto " + entidad.getNombre().toLowerCase() + "Dto = new " + entidad.getNombre() + "Dto();\n\n");
                 for (AtributoDto atr : entidad.getAtributos()) {
-                    if(!atr.getTipo().equals("Time") && !atr.getTipo().equals("Timestamp")) {
+                    if(!atr.getTipo().equals("Time") && !atr.getTipo().equals("Timestamp") && !atr.getTipo().equals("Date")) {
                         letraInicial = atr.getNombre().substring(0, 1).toUpperCase();
                         resto = atr.getNombre().substring(1);
                         nombreCompleto = letraInicial + resto;
@@ -1139,11 +1214,10 @@ public class GeneradorService {
                         "\t\torg.springframework.security.core.userdetails.User userConnected = (org.springframework.security.core.userdetails.User) auth.getPrincipal();\n" +
                         "\t\tUser user = userRepository.findByUsername(userConnected.getUsername());\n\n");
 
-                writer.append("\t\t" + entidad.getNombre().toLowerCase() + "Repository.deleteById(id);\n\n");
-                writer.append("\t\t" + entidad.getNombre() + " " + entidad.getNombre().toLowerCase() + " = new " + entidad.getNombre() + "();\n");
+                writer.append("\t\t" + entidad.getNombre() + " " + entidad.getNombre().toLowerCase() + " = " + entidad.getNombre().toLowerCase() + "Repository.findById(id);\n");
                 for (AtributoDto atr : entidad.getAtributos()) {
                     if (!atr.isPrimaryKey()) {
-                        if(!atr.getTipo().equals("Time") && !atr.getTipo().equals("Timestamp")) {
+                        if(!atr.getTipo().equals("Time") && !atr.getTipo().equals("Timestamp") && !atr.getTipo().equals("Date")) {
                             letraInicial = atr.getNombre().substring(0, 1).toUpperCase();
                             resto = atr.getNombre().substring(1);
                             nombreCompleto = letraInicial + resto;
@@ -1153,12 +1227,32 @@ public class GeneradorService {
                                 letraInicial = atr.getNombre().substring(0, 1).toUpperCase();
                                 resto = atr.getNombre().substring(1);
                                 nombreCompleto = letraInicial + resto;
-                                writer.append("\t\t" + entidad.getNombre().toLowerCase() + ".set" + nombreCompleto + "(Time.valueOf(LocalTime.parse(" + entidad.getNombre().toLowerCase() + "Dto.get" + nombreCompleto + "())));\n");
+                                if(atr.isNullable()){
+                                    writer.append("\t\tif(!" + entidad.getNombre().toLowerCase() + "Dto.get" + nombreCompleto + "().isBlank()){\n");
+                                    writer.append("\t\t\t" + entidad.getNombre().toLowerCase() + ".set" + nombreCompleto + "(Time.valueOf(LocalTime.parse(" + entidad.getNombre().toLowerCase() + "Dto.get" + nombreCompleto + "())));\n\t\t}\n");
+                                }else{
+                                    writer.append("\t\t" + entidad.getNombre().toLowerCase() + ".set" + nombreCompleto + "(Time.valueOf(LocalTime.parse(" + entidad.getNombre().toLowerCase() + "Dto.get" + nombreCompleto + "())));\n");
+                                }
+                            }else if(atr.getTipo().equals("Timestamp")){
+                                letraInicial = atr.getNombre().substring(0, 1).toUpperCase();
+                                resto = atr.getNombre().substring(1);
+                                nombreCompleto = letraInicial + resto;
+                                if(atr.isNullable()){
+                                    writer.append("\t\tif(!" + entidad.getNombre().toLowerCase() + "Dto.get" + nombreCompleto + "().isBlank()){\n");
+                                    writer.append("\t\t\t" + entidad.getNombre().toLowerCase() + ".set" + nombreCompleto + "(Timestamp.valueOf(LocalDateTime.parse(" + entidad.getNombre().toLowerCase() + "Dto.get" + nombreCompleto + "())));\n\t\t}\n");
+                                }else{
+                                    writer.append("\t\t" + entidad.getNombre().toLowerCase() + ".set" + nombreCompleto + "(Timestamp.valueOf(LocalDateTime.parse(" + entidad.getNombre().toLowerCase() + "Dto.get" + nombreCompleto + "())));\n");
+                                }
                             }else{
                                 letraInicial = atr.getNombre().substring(0, 1).toUpperCase();
                                 resto = atr.getNombre().substring(1);
                                 nombreCompleto = letraInicial + resto;
-                                writer.append("\t\t" + entidad.getNombre().toLowerCase() + ".set" + nombreCompleto + "(Timestamp.valueOf(LocalDateTime.parse(" + entidad.getNombre().toLowerCase() + "Dto.get" + nombreCompleto + "())));\n");
+                                if(atr.isNullable()){
+                                    writer.append("\t\tif(!" + entidad.getNombre().toLowerCase() + "Dto.get" + nombreCompleto + "().isBlank()){\n");
+                                    writer.append("\t\t\t" + entidad.getNombre().toLowerCase() + ".set" + nombreCompleto + "(Date.valueOf(" + entidad.getNombre().toLowerCase() + "Dto.get" + nombreCompleto + "()));\n\t\t}\n");
+                                }else{
+                                    writer.append("\t\t" + entidad.getNombre().toLowerCase() + ".set" + nombreCompleto + "(Date.valueOf(" + entidad.getNombre().toLowerCase() + "Dto.get" + nombreCompleto + "()));\n");
+                                }
                             }
                         }
                     }
@@ -1179,7 +1273,10 @@ public class GeneradorService {
 
                 writer.append("\t\t" + entidad.getNombre().toLowerCase() + ".setUser(user);\n\n");
 
-                writer.append("\t\t" + entidad.getNombre().toLowerCase() + "Repository.save(" + entidad.getNombre().toLowerCase() + ");\n\n");
+                writer.append("\t\ttry{\n" +
+                        "\t\t\t" + entidad.getNombre().toLowerCase() + "Repository.save(" + entidad.getNombre().toLowerCase() + ");\n" +
+                        "\t\t}catch (Exception ex){\n" +
+                        "\t\t\treturn \"redirect:/" + entidad.getNombre() + "?failPut\";\n\t\t}\n\n");
                 writer.append("\t\treturn \"redirect:/" + entidad.getNombre() + "?successPut\";\n\t}\n\n");
 
 
@@ -1429,31 +1526,61 @@ public class GeneradorService {
                             case "String":
                                 writer.append("\t\t\t\t<div class=\"input-group mt-5\">\n");
                                 writer.append("\t\t\t\t\t<label for=\"" + atr.getNombre() + "\" class=\"control-label input-group-text\" th:text=\"'" + atr.getNombre() + "'\"></label>\n");
-                                writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"text\" required th:field=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                if(atr.isNullable()){
+                                    writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"text\" th:field=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                }else{
+                                    writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"text\" required th:field=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                }
                                 break;
 
-                            case "int", "float":
+                            case "int":
                                 writer.append("\t\t\t\t<div class=\"input-group mt-5\">\n");
                                 writer.append("\t\t\t\t\t<label for=\"" + atr.getNombre() + "\" class=\"control-label input-group-text\" th:text=\"'" + atr.getNombre() + "'\"></label>\n");
-                                writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"number\" required th:field=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                if(atr.isNullable()){
+                                    writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"number\" th:field=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                }else{
+                                    writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"number\" required th:field=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                }
+                                break;
+
+                            case "float":
+                                writer.append("\t\t\t\t<div class=\"input-group mt-5\">\n");
+                                writer.append("\t\t\t\t\t<label for=\"" + atr.getNombre() + "\" class=\"control-label input-group-text\" th:text=\"'" + atr.getNombre() + "'\"></label>\n");
+                                if(atr.isNullable()){
+                                    writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"number\" step=\"0.01\" th:field=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                }else{
+                                    writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"number\" step=\"0.01\" required th:field=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                }
                                 break;
 
                             case "Date":
                                 writer.append("\t\t\t\t<div class=\"input-group mt-5\">\n");
                                 writer.append("\t\t\t\t\t<label for=\"" + atr.getNombre() + "\" class=\"control-label input-group-text\" th:text=\"'" + atr.getNombre() + "'\"></label>\n");
-                                writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"date\" required th:field=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                if(atr.isNullable()){
+                                    writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"date\" th:field=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                }else{
+                                    writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"date\" required th:field=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                }
                                 break;
 
                             case "Time":
                                 writer.append("\t\t\t\t<div class=\"input-group mt-5\">\n");
                                 writer.append("\t\t\t\t\t<label for=\"" + atr.getNombre() + "\" class=\"control-label input-group-text\" th:text=\"'" + atr.getNombre() + "'\"></label>\n");
-                                writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"time\" required th:field=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                if(atr.isNullable()){
+                                    writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"time\" th:field=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                }else{
+                                    writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"time\" required th:field=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                }
                                 break;
 
                             case "Timestamp":
                                 writer.append("\t\t\t\t<div class=\"input-group mt-5\">\n");
                                 writer.append("\t\t\t\t\t<label for=\"" + atr.getNombre() + "\" class=\"control-label input-group-text\" th:text=\"'" + atr.getNombre() + "'\"></label>\n");
-                                writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"datetime-local\" required th:field=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                if(atr.isNullable()){
+                                    writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"datetime-local\" th:field=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                }else{
+                                    writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"datetime-local\" required th:field=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                }
                                 break;
                         }
 
@@ -1573,43 +1700,71 @@ public class GeneradorService {
                             case "String":
                                 writer.append("\t\t\t\t<div class=\"input-group mt-5\">\n");
                                 writer.append("\t\t\t\t\t<label for=\"" + atr.getNombre() + "\" class=\"control-label input-group-text\" th:text=\"'" + atr.getNombre() + "'\"></label>\n");
-                                writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"text\" required th:field=\"*{" + atr.getNombre() + "}\" th:value=\\\"*{\" + atr.getNombre() + \"}\\\">\n\t\t\t\t</div>\n\n");
+                                if(atr.isNullable()){
+                                    writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"text\" th:field=\"*{" + atr.getNombre() + "}\" th:value=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                }else{
+                                    writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"text\" required th:field=\"*{" + atr.getNombre() + "}\" th:value=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                }
                                 break;
 
                             case "int":
                                 writer.append("\t\t\t\t<div class=\"input-group mt-5\">\n");
                                 writer.append("\t\t\t\t\t<label for=\"" + atr.getNombre() + "\" class=\"control-label input-group-text\" th:text=\"'" + atr.getNombre() + "'\"></label>\n");
-                                writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"number\" required th:field=\"*{" + atr.getNombre() + "}\" th:value=\\\"*{\" + atr.getNombre() + \"}\\\">\n\t\t\t\t</div>\n\n");
+                                if(atr.isNullable()){
+                                    writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"number\" th:field=\"*{" + atr.getNombre() + "}\" th:value=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                }else{
+                                    writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"number\" required th:field=\"*{" + atr.getNombre() + "}\" th:value=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                }
                                 break;
 
                             case "float":
                                 writer.append("\t\t\t\t<div class=\"input-group mt-5\">\n");
                                 writer.append("\t\t\t\t\t<label for=\"" + atr.getNombre() + "\" class=\"control-label input-group-text\" th:text=\"'" + atr.getNombre() + "'\"></label>\n");
-                                writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"number\" required th:field=\"*{" + atr.getNombre() + "}\" th:value=\\\"*{\" + atr.getNombre() + \"}\\\">\n\t\t\t\t</div>\n\n");
+                                if(atr.isNullable()){
+                                    writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"number\" step=\"0.01\" th:field=\"*{" + atr.getNombre() + "}\" th:value=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                }else{
+                                    writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"number\" step=\"0.01\" required th:field=\"*{" + atr.getNombre() + "}\" th:value=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                }
                                 break;
 
                             case "Date":
                                 writer.append("\t\t\t\t<div class=\"input-group mt-5\">\n");
                                 writer.append("\t\t\t\t\t<label for=\"" + atr.getNombre() + "\" class=\"control-label input-group-text\" th:text=\"'" + atr.getNombre() + "'\"></label>\n");
-                                writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"date\" required th:field=\"*{" + atr.getNombre() + "}\" th:value=\\\"*{\" + atr.getNombre() + \"}\\\">\n\t\t\t\t</div>\n\n");
+                                if(atr.isNullable()){
+                                    writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"date\" th:field=\"*{" + atr.getNombre() + "}\" th:value=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                }else{
+                                    writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"date\" required th:field=\"*{" + atr.getNombre() + "}\" th:value=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                }
                                 break;
 
                             case "Time":
                                 writer.append("\t\t\t\t<div class=\"input-group mt-5\">\n");
                                 writer.append("\t\t\t\t\t<label for=\"" + atr.getNombre() + "\" class=\"control-label input-group-text\" th:text=\"'" + atr.getNombre() + "'\"></label>\n");
-                                writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"time\" required th:field=\"*{" + atr.getNombre() + "}\" th:value=\\\"*{\" + atr.getNombre() + \"}\\\">\n\t\t\t\t</div>\n\n");
+                                if(atr.isNullable()){
+                                    writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"time\" th:field=\"*{" + atr.getNombre() + "}\" th:value=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                }else{
+                                    writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"time\" required th:field=\"*{" + atr.getNombre() + "}\" th:value=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                }
                                 break;
 
                             case "Timestamp":
                                 writer.append("\t\t\t\t<div class=\"input-group mt-5\">\n");
                                 writer.append("\t\t\t\t\t<label for=\"" + atr.getNombre() + "\" class=\"control-label input-group-text\" th:text=\"'" + atr.getNombre() + "'\"></label>\n");
-                                writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"datetime-local\" required th:field=\"*{" + atr.getNombre() + "}\" th:value=\\\"*{\" + atr.getNombre() + \"}\\\">\n\t\t\t\t</div>\n\n");
+                                if(atr.isNullable()){
+                                    writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"datetime-local\" th:field=\"*{" + atr.getNombre() + "}\" th:value=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                }else{
+                                    writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"datetime-local\" required th:field=\"*{" + atr.getNombre() + "}\" th:value=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                }
                                 break;
 
                             default:
                                 writer.append("\t\t\t\t<div class=\"input-group mt-5\">\n");
                                 writer.append("\t\t\t\t\t<label for=\"" + atr.getNombre() + "\" class=\"control-label input-group-text\" th:text=\"'" + atr.getNombre() + "'\"></label>\n");
-                                writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"text\" required th:field=\"*{" + atr.getNombre() + "}\" th:value=\\\"*{\" + atr.getNombre() + \"}\\\">\n\t\t\t\t</div>\n\n");
+                                if(atr.isNullable()){
+                                    writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"text\" th:field=\"*{" + atr.getNombre() + "}\" th:value=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                }else{
+                                    writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"text\" required th:field=\"*{" + atr.getNombre() + "}\" th:value=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                }
                         }
                     } else {
                         writer.append("\t\t\t\t<div class=\"input-group mt-5\">\n");
@@ -1819,43 +1974,71 @@ public class GeneradorService {
                             case "String":
                                 writer.append("\t\t\t\t<div class=\"input-group mt-5\">\n");
                                 writer.append("\t\t\t\t\t<label for=\"" + atr.getNombre() + "\" class=\"control-label input-group-text\" th:text=\"'" + atr.getNombre() + "'\"></label>\n");
-                                writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"text\" required th:field=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                if(atr.isNullable()){
+                                    writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"text\" th:field=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                }else{
+                                    writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"text\" required th:field=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                }
                                 break;
 
                             case "int":
                                 writer.append("\t\t\t\t<div class=\"input-group mt-5\">\n");
                                 writer.append("\t\t\t\t\t<label for=\"" + atr.getNombre() + "\" class=\"control-label input-group-text\" th:text=\"'" + atr.getNombre() + "'\"></label>\n");
-                                writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"number\" required th:field=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                if(atr.isNullable()){
+                                    writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"number\" th:field=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                }else{
+                                    writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"number\" required th:field=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                }
                                 break;
 
                             case "float":
                                 writer.append("\t\t\t\t<div class=\"input-group mt-5\">\n");
                                 writer.append("\t\t\t\t\t<label for=\"" + atr.getNombre() + "\" class=\"control-label input-group-text\" th:text=\"'" + atr.getNombre() + "'\"></label>\n");
-                                writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"number\" required th:field=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                if(atr.isNullable()){
+                                    writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"number\" step=\"0.01\" th:field=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                }else{
+                                    writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"number\" step=\"0.01\" required th:field=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                }
                                 break;
 
                             case "Date":
                                 writer.append("\t\t\t\t<div class=\"input-group mt-5\">\n");
                                 writer.append("\t\t\t\t\t<label for=\"" + atr.getNombre() + "\" class=\"control-label input-group-text\" th:text=\"'" + atr.getNombre() + "'\"></label>\n");
-                                writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"date\" required th:field=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                if(atr.isNullable()){
+                                    writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"date\" th:field=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                }else{
+                                    writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"date\" required th:field=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                }
                                 break;
 
                             case "Time":
                                 writer.append("\t\t\t\t<div class=\"input-group mt-5\">\n");
                                 writer.append("\t\t\t\t\t<label for=\"" + atr.getNombre() + "\" class=\"control-label input-group-text\" th:text=\"'" + atr.getNombre() + "'\"></label>\n");
-                                writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"time\" required th:field=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                if(atr.isNullable()){
+                                    writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"time\" th:field=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                }else{
+                                    writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"time\" required th:field=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                }
                                 break;
 
                             case "Timestamp":
                                 writer.append("\t\t\t\t<div class=\"input-group mt-5\">\n");
                                 writer.append("\t\t\t\t\t<label for=\"" + atr.getNombre() + "\" class=\"control-label input-group-text\" th:text=\"'" + atr.getNombre() + "'\"></label>\n");
-                                writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"datetime-local\" required th:field=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                if(atr.isNullable()){
+                                    writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"datetime-local\" th:field=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                }else{
+                                    writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"datetime-local\" required th:field=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                }
                                 break;
 
                             default:
                                 writer.append("\t\t\t\t<div class=\"input-group mt-5\">\n");
                                 writer.append("\t\t\t\t\t<label for=\"" + atr.getNombre() + "\" class=\"control-label input-group-text\" th:text=\"'" + atr.getNombre() + "'\"></label>\n");
-                                writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"text\" required th:field=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                if(atr.isNullable()){
+                                    writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"text\" th:field=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                }else{
+                                    writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"text\" required th:field=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                }
                         }
                     }
                 }
@@ -1913,43 +2096,71 @@ public class GeneradorService {
                             case "String":
                                 writer.append("\t\t\t\t<div class=\"input-group mt-5\">\n");
                                 writer.append("\t\t\t\t\t<label for=\"" + atr.getNombre() + "\" class=\"control-label input-group-text\" th:text=\"'" + atr.getNombre() + "'\"></label>\n");
-                                writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"text\" required th:field=\"*{" + atr.getNombre() + "}\" th:value=\\\"*{\" + atr.getNombre() + \"}\\\">\n\t\t\t\t</div>\n\n");
+                                if(atr.isNullable()){
+                                    writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"text\" th:field=\"*{" + atr.getNombre() + "}\" th:value=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                }else{
+                                    writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"text\" required th:field=\"*{" + atr.getNombre() + "}\" th:value=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                }
                                 break;
 
                             case "int":
                                 writer.append("\t\t\t\t<div class=\"input-group mt-5\">\n");
                                 writer.append("\t\t\t\t\t<label for=\"" + atr.getNombre() + "\" class=\"control-label input-group-text\" th:text=\"'" + atr.getNombre() + "'\"></label>\n");
-                                writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"number\" required th:field=\"*{" + atr.getNombre() + "}\" th:value=\\\"*{\" + atr.getNombre() + \"}\\\">\n\t\t\t\t</div>\n\n");
+                                if(atr.isNullable()){
+                                    writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"number\" th:field=\"*{" + atr.getNombre() + "}\" th:value=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                }else{
+                                    writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"number\" required th:field=\"*{" + atr.getNombre() + "}\" th:value=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                }
                                 break;
 
                             case "float":
                                 writer.append("\t\t\t\t<div class=\"input-group mt-5\">\n");
                                 writer.append("\t\t\t\t\t<label for=\"" + atr.getNombre() + "\" class=\"control-label input-group-text\" th:text=\"'" + atr.getNombre() + "'\"></label>\n");
-                                writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"number\" required th:field=\"*{" + atr.getNombre() + "}\" th:value=\\\"*{\" + atr.getNombre() + \"}\\\">\n\t\t\t\t</div>\n\n");
+                                if(atr.isNullable()){
+                                    writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"number\" step=\"0.01\" th:field=\"*{" + atr.getNombre() + "}\" th:value=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                }else{
+                                    writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"number\" step=\"0.01\" required th:field=\"*{" + atr.getNombre() + "}\" th:value=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                }
                                 break;
 
                             case "Date":
                                 writer.append("\t\t\t\t<div class=\"input-group mt-5\">\n");
                                 writer.append("\t\t\t\t\t<label for=\"" + atr.getNombre() + "\" class=\"control-label input-group-text\" th:text=\"'" + atr.getNombre() + "'\"></label>\n");
-                                writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"date\" required th:field=\"*{" + atr.getNombre() + "}\" th:value=\\\"*{\" + atr.getNombre() + \"}\\\">\n\t\t\t\t</div>\n\n");
+                                if(atr.isNullable()){
+                                    writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"date\" th:field=\"*{" + atr.getNombre() + "}\" th:value=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                }else{
+                                    writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"date\" required th:field=\"*{" + atr.getNombre() + "}\" th:value=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                }
                                 break;
 
                             case "Time":
                                 writer.append("\t\t\t\t<div class=\"input-group mt-5\">\n");
                                 writer.append("\t\t\t\t\t<label for=\"" + atr.getNombre() + "\" class=\"control-label input-group-text\" th:text=\"'" + atr.getNombre() + "'\"></label>\n");
-                                writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"time\" required th:field=\"*{" + atr.getNombre() + "}\" th:value=\\\"*{\" + atr.getNombre() + \"}\\\">\n\t\t\t\t</div>\n\n");
+                                if(atr.isNullable()){
+                                    writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"time\" th:field=\"*{" + atr.getNombre() + "}\" th:value=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                }else{
+                                    writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"time\" required th:field=\"*{" + atr.getNombre() + "}\" th:value=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                }
                                 break;
 
                             case "Timestamp":
                                 writer.append("\t\t\t\t<div class=\"input-group mt-5\">\n");
                                 writer.append("\t\t\t\t\t<label for=\"" + atr.getNombre() + "\" class=\"control-label input-group-text\" th:text=\"'" + atr.getNombre() + "'\"></label>\n");
-                                writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"datetime-local\" required th:field=\"*{" + atr.getNombre() + "}\" th:value=\\\"*{\" + atr.getNombre() + \"}\\\">\n\t\t\t\t</div>\n\n");
+                                if(atr.isNullable()){
+                                    writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"datetime-local\" th:field=\"*{" + atr.getNombre() + "}\" th:value=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                }else{
+                                    writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"datetime-local\" required th:field=\"*{" + atr.getNombre() + "}\" th:value=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                }
                                 break;
 
                             default:
                                 writer.append("\t\t\t\t<div class=\"input-group mt-5\">\n");
                                 writer.append("\t\t\t\t\t<label for=\"" + atr.getNombre() + "\" class=\"control-label input-group-text\" th:text=\"'" + atr.getNombre() + "'\"></label>\n");
-                                writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"text\" required th:field=\"*{" + atr.getNombre() + "}\" th:value=\\\"*{\" + atr.getNombre() + \"}\\\">\n\t\t\t\t</div>\n\n");
+                                if(atr.isNullable()){
+                                    writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"text\" th:field=\"*{" + atr.getNombre() + "}\" th:value=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                }else{
+                                    writer.append("\t\t\t\t\t<input id=\"" + atr.getNombre() + "\" class=\"form-control\" type=\"text\" required th:field=\"*{" + atr.getNombre() + "}\" th:value=\"*{" + atr.getNombre() + "}\">\n\t\t\t\t</div>\n\n");
+                                }
                         }
                     } else {
                         writer.append("\t\t\t\t<div class=\"input-group mt-5\">\n");
@@ -2793,7 +3004,8 @@ public class GeneradorService {
                 writer.append("\t@PostMapping(\"/registro\")\n" +
                         "\tpublic String registryUser(@ModelAttribute(\"usuario\") UserDtoPsw userDtoPsw){\n\n" +
                         "\t\tif(userRepository.findByUsername(userDtoPsw.getUsername()) != null ||\n" +
-                        "\t\t\tuserRepository.findByEmail(userDtoPsw.getEmail()) != null){\n" +
+                        "\t\t\tuserRepository.findByEmail(userDtoPsw.getEmail()) != null ||\n" +
+                        "\t\t\tuserDtoPsw.getUsername().equals(userDtoPsw.getPassword())){\n" +
                         "\t\t\treturn \"redirect:/registro?error\";\n\t\t}\n\n" +
                         "\t\tuserService.save(userDtoPsw);\n\n" +
                         "\t\treturn \"redirect:/login?exito\";\n\t}\n\n");
@@ -2810,7 +3022,8 @@ public class GeneradorService {
                     "\t@PostMapping(\"/usuarios/registry\")\n" +
                     "\tpublic String userRegistryAdmin(UserDtoPsw userDtoPsw){\n\n" +
                     "\t\tif(userRepository.findByUsername(userDtoPsw.getUsername()) != null ||\n" +
-                    "\t\t\tuserRepository.findByEmail(userDtoPsw.getEmail()) != null){\n" +
+                    "\t\t\tuserRepository.findByEmail(userDtoPsw.getEmail()) != null ||\n" +
+                    "\t\t\tuserDtoPsw.getUsername().equals(userDtoPsw.getPassword())){\n" +
                     "\t\t\treturn \"redirect:/usuarios?fallo\";\n\t\t}\n\n" +
                     "\t\tUser user = new User(userDtoPsw.getUsername(),\n" +
                     "\t\t\tencoder.encode(userDtoPsw.getPassword()),\n" +
