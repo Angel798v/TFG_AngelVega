@@ -290,13 +290,15 @@ public class GeneradorService {
                                 aux = "\t@OneToOne\n\t@JoinColumn(name=\"id_" + relacion.getNameB().toLowerCase() + "\")\n\tprivate "
                                         + relacion.getNameB() + " " + relacion.getNameB().toLowerCase() + ";\n\n";
 
-                                aux += "\tpublic void set" + relacion.getNameB() + "(" + relacion.getNameB() + " " + relacion.getNameB().toLowerCase() + "){\n" +
-                                        "\t\tif(this." + relacion.getNameB().toLowerCase() + " != null){\n\t\t\tthis." + relacion.getNameB().toLowerCase() +
-                                        ".set" + relacion.getNameA() + "(null);\n" +
-                                        "\t\t}\n" +
-                                        "this." + relacion.getNameB().toLowerCase() + " = " + relacion.getNameB().toLowerCase() + ";\n" +
-                                        "\t\tif(" + relacion.getNameB().toLowerCase() + " != null){\n" +
-                                        "\t\t\t" + relacion.getNameB().toLowerCase() + ".set" + relacion.getNameA() + "(this);\n\t\t}\n\t}\n\n";
+                                if(relacion.isBidireccional()) {
+                                    aux += "\tpublic void set" + relacion.getNameB() + "(" + relacion.getNameB() + " " + relacion.getNameB().toLowerCase() + "){\n" +
+                                            "\t\tif(this." + relacion.getNameB().toLowerCase() + " != null){\n\t\t\tthis." + relacion.getNameB().toLowerCase() +
+                                            ".set" + relacion.getNameA() + "(null);\n" +
+                                            "\t\t}\n" +
+                                            "\t\tthis." + relacion.getNameB().toLowerCase() + " = " + relacion.getNameB().toLowerCase() + ";\n" +
+                                            "\t\tif(" + relacion.getNameB().toLowerCase() + " != null){\n" +
+                                            "\t\t\t" + relacion.getNameB().toLowerCase() + ".set" + relacion.getNameA() + "(this);\n\t\t}\n\t}\n\n";
+                                }
 
                             }else {	//One to many
                                 aux = "\t@OneToMany\n\t@JoinColumn(name=\"id_" + relacion.getNameB().toLowerCase() + "\")\n\tprivate Set<"
@@ -545,7 +547,7 @@ public class GeneradorService {
             for(Relacion relacion : relaciones){
                 if(relacion.getA() == entidad) {
                     if (relacion.getCardinalityA().equals("0..1") && relacion.getCardinalityB().equals("0..1")) {
-                        writer.append("\t" + relacion.getNameA() + " findBy" + relacion.getNameB() + "Id(long id)\n\n");
+                        writer.append("\t" + relacion.getNameA() + " findBy" + relacion.getNameB() + "Id(long id);\n\n");
                     }
                 }
             }

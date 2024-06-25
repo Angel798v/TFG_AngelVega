@@ -364,12 +364,12 @@ public class GeneradorController {
         //Entidades
         EntidadDto mecanico = new EntidadDto();
         EntidadDto cliente = new EntidadDto();
-        EntidadDto tipo_servicio = new EntidadDto();
+        EntidadDto servicio = new EntidadDto();
         EntidadDto reparacion = new EntidadDto();
 
         mecanico.setNombre("Mecanico");
         cliente.setNombre("Cliente");
-        tipo_servicio.setNombre("Tipo_servicio");
+        servicio.setNombre("Servicio");
         reparacion.setNombre("Reparacion");
 
         //entidadesService.switchVistaCompacta();
@@ -378,27 +378,35 @@ public class GeneradorController {
         AtributoDto pk_mecanico = new AtributoDto("id_mecanico","long", true, false,false,false,"",false,"",0);
         AtributoDto nombre_mecanico = new AtributoDto("nombre","String", false, false,true,false,"",false,"",20);
         AtributoDto pk_cliente = new AtributoDto("id_cliente","long", true, false,false,false,"",false,"",0);
-        AtributoDto pk_tipo_servicio = new AtributoDto("id_tipo_servicio","long", true, false,false,false,"",false,"",0);
+        AtributoDto nombre_cliente = new AtributoDto("nombre","String", false, false,true,false,"",false,"",20);
+        AtributoDto pk_servicio = new AtributoDto("id_servicio","long", true, false,false,false,"",false,"",0);
+        AtributoDto nombre_servicio = new AtributoDto("nombre","String", false, false,true,false,"",false,"",20);
+        AtributoDto coste_servicio = new AtributoDto("coste","float", false, false,true,false,"",false,"",0);
         AtributoDto pk_reparacion = new AtributoDto("id_reparacion","long", true, false,false,false,"",false,"",0);
+        AtributoDto fecha_reparacion = new AtributoDto("fecha","Timestamp", false, false,false,false,"",false,"",0);
 
         atributosService.addAtributo(mecanico,pk_mecanico);
         atributosService.addAtributo(mecanico,nombre_mecanico);
         atributosService.addAtributo(cliente,pk_cliente);
-        atributosService.addAtributo(tipo_servicio,pk_tipo_servicio);
+        atributosService.addAtributo(cliente,nombre_cliente);
+        atributosService.addAtributo(servicio,pk_servicio);
+        atributosService.addAtributo(servicio,nombre_servicio);
+        atributosService.addAtributo(servicio,coste_servicio);
         atributosService.addAtributo(reparacion,pk_reparacion);
+        atributosService.addAtributo(reparacion,fecha_reparacion);
 
         //Relaciones
-        Relacion reparacion_mecanico = new Relacion(reparacion,mecanico,"N","0..1",true, true);
+        Relacion reparacion_mecanico = new Relacion(reparacion,mecanico,"N","M",true, true);
         reparacion_mecanico.setNameA(reparacion.getNombre());
         reparacion_mecanico.setNameB(mecanico.getNombre());
 
-        Relacion reparacion_cliente = new Relacion(reparacion,cliente,"N","0..1",false, true);
+        Relacion reparacion_cliente = new Relacion(reparacion,cliente,"0..1","0..1",false, false);
         reparacion_cliente.setNameA(reparacion.getNombre());
         reparacion_cliente.setNameB(cliente.getNombre());
 
-        Relacion reparacion_tipoServicio = new Relacion(reparacion,tipo_servicio,"N","M",true, false);
+        Relacion reparacion_tipoServicio = new Relacion(reparacion,servicio,"N","0..1",true, false);
         reparacion_tipoServicio.setNameA(reparacion.getNombre());
-        reparacion_tipoServicio.setNameB(tipo_servicio.getNombre());
+        reparacion_tipoServicio.setNameB(servicio.getNombre());
 
         relacionesService.addRelacion(reparacion_mecanico);
         relacionesService.addRelacion(reparacion_cliente);
@@ -406,18 +414,23 @@ public class GeneradorController {
 
         entidadesService.addEntidad(mecanico);
         entidadesService.addEntidad(cliente);
-        entidadesService.addEntidad(tipo_servicio);
+        entidadesService.addEntidad(servicio);
         entidadesService.addEntidad(reparacion);
 
-        Set<AtributoDto> atributos = new HashSet<AtributoDto>(usuarioService.getAtributosUsuario());
+        /*Set<AtributoDto> atributos = new HashSet<AtributoDto>(usuarioService.getAtributosUsuario());
         UsuarioAdminCredentials usuarioAdmin = new UsuarioAdminCredentials("angel@gmail.com","angelAdmin","admin", atributos, null);
         usuarioService.setAdmin(usuarioAdmin);
 
+         */
+
+        /*
         AtributoDto atributo = new AtributoDto("Apellidos","String",false,false,true,false,"",false,"",15);
         usuarioService.addAtributosUsuario(atributo);
 
         AtributoDto atributo2 = new AtributoDto("Direccion","String",false,false,false,false,"",false,"",20);
         usuarioService.addAtributosUsuario(atributo2);
+
+        */
 
 
         //IDIOMAS
@@ -426,16 +439,23 @@ public class GeneradorController {
                 "Inicio","Servicios","Pagina de error","Nombre de usuario", "Contraseña","Email","Rol",
                 "Usuarios","Guardar","Volver","Iniciar sesión","Cerrar sesión", "Registrar usuario", "Registro",
                 "Idioma");
-        Idioma english = new Idioma("Inglés","EN","Show","Add","Edit","Delete","Home",
+        /*Idioma english = new Idioma("Inglés","EN","Show","Add","Edit","Delete","Home",
                 "Services","Error page","Username", "Password","Mail","Role",
-                "Users","Save","Back","Login","Logout", "Registry user", "Signup", "Language");
+                "Users","Save","Back","Login","Logout", "Registry user", "Signup", "Language");*/
+
+        Idioma frances = new Idioma("Francés", "FR", "Montrer", "Créer", "Modifier", "Éliminer",
+                "Début", "Prestations de service", "Page d'erreur", "Nom d'utilisateur", "Mot de passe", "E-mail", "Rôle",
+                "Utilisateurs", "sauvegarder", "Revenir", "Commencer la session", "Fermer la session", "Enregistrer un utilisateur",
+                "Enregistrer","langage");
 
         idiomaService.addIdioma(spanish);
-        idiomaService.addIdioma(english);
-        idiomaService.setIdiomaDefault(spanish);
+        //idiomaService.addIdioma(english);
+        idiomaService.addIdioma(frances);
+        //idiomaService.setIdiomaDefault(spanish);
 
         //PROJECT PROPERTIES
 
+        /*
         projectService.setTitleProject("Taller SA");
         projectService.setAbbreviatedTitleProject("WkShop");
         projectService.setModule("workshop");
@@ -444,13 +464,15 @@ public class GeneradorController {
         projectService.setNumPuerto(8092);
         projectService.setNumPuertoDB(3306);
 
+        */
+
         //SECURITY
 
         RoleDto admin = new RoleDto(1,"ADMIN");
-        RoleDto user = new RoleDto(2,"USER");
+        //RoleDto user = new RoleDto(2,"USER");
 
         rolesService.addRole(admin);
-        rolesService.addRole(user);
+        //rolesService.addRole(user);
 
         for(EntidadDto entidad : entidadesService.getEntidades()) {
 
@@ -459,10 +481,10 @@ public class GeneradorController {
                 entidad.getPermisosRoles().getOperationPOST().add(admin);
                 entidad.getPermisosRoles().getOperationPUT().add(admin);
                 entidad.getPermisosRoles().getOperationDELETE().add(admin);
-                entidad.getPermisosRoles().getOperationGET().add(user);
-                entidad.getPermisosRoles().getOperationPOST().add(user);
-                entidad.getPermisosRoles().getOperationPUT().add(user);
-                entidad.getPermisosRoles().getOperationDELETE().add(user);
+                //entidad.getPermisosRoles().getOperationGET().add(user);
+                //entidad.getPermisosRoles().getOperationPOST().add(user);
+                //entidad.getPermisosRoles().getOperationPUT().add(user);
+                //entidad.getPermisosRoles().getOperationDELETE().add(user);
             }else{
                 entidad.getPermisosRoles().getOperationGET().add(admin);
                 entidad.getPermisosRoles().getOperationPOST().add(admin);
@@ -473,11 +495,11 @@ public class GeneradorController {
         }
 
         rolesService.setRegistrarUsuarios(true);
-        rolesService.setDefaultRole(user);
+        //rolesService.setDefaultRole(user);
 
         //DISEÑO
-        designService.setColores(new ColorPick("#8ED8F1","#FFFFFF", "#FEF9C7",false, true));
-        designService.switchNav();
+        //designService.setColores(new ColorPick("#8ED8F1","#FFFFFF", "#FEF9C7",false, true));
+        //designService.switchNav();
 
 
         return "redirect:/IndexGenerador";
